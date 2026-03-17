@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Tab Master Pro - LemonTree Guitar</title>
+<!-- 모던한 웹 폰트 -->
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
+<style>
+    :root {
+        --font-main: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+        --color-bg: #f8fafc;
+        --color-surface: #ffffff;
+        --color-text-main: #0f172a;
+        --color-text-muted: #64748b;
+        --color-primary: #3b82f6;
+        --color-primary-hover: #2563eb;
+        --color-success: #10b981;
+        --color-error: #ef4444;
+        --color-warning: #f59e0b;
+        
+        --guitar-neck: linear-gradient(180deg, #2c1e16 0%, #1a110c 100%);
+        --guitar-head: #d4a373;
+        --guitar-frets: #cbd5e1;
+        --guitar-string: #f1f5f9;
+        
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        --radius-lg: 12px;
+        --radius-xl: 16px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+        font-family: var(--font-main);
+        background-color: var(--color-bg);
+        color: var(--color-text-main);
+        margin: 0;
+        padding: 0;
+        user-select: none;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+    }
+
+    /* 반응형 게임 컨테이너 */
+    .game-container {
+        background: var(--color-surface);
+        width: 100%;
+        max-width: 1200px;
+        display: flex;
+        flex-direction: column;
+        transition: all 0.3s ease;
+        padding: 20px;
+    }
+
+    /* 데스크탑/태블릿 최적화 (가로 분할 및 스크롤 제거) */
+    @media (min-width: 1024px) {
+        body {
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+            background-color: #e2e8f0;
+        }
+        .game-container {
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-lg);
+            height: 95vh;
+            max-height: 800px;
+            padding: 30px 40px;
+        }
+        .main-layout {
+            display: flex;
+            gap: 40px;
+            flex-grow: 1;
+            height: 100%;
+            overflow: hidden;
+        }
+        .left-panel {
+            flex: 0 0 320px;
+            display: flex;
+            flex-direction: column;
+            border-right: 2px solid #f1f5f9;
+            padding-right: 30px;
+        }
+        .right-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            overflow: hidden;
+        }
+    }
+
+    @media (max-width: 1023px) {
+        .main-layout {
+            display: flex;
+            flex-direction: column;
+        }
+        .left-panel, .right-panel {
+            width: 100%;
+        }
+    }
+
+    /* 헤더 */
+    .header-content {
+        text-align: center;
+        margin-bottom: 25px;
+        flex-shrink: 0;
+    }
+    .header-content h1 {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+    }
+    .header-content .subtitle {
+        margin: 4px 0 0 0;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--color-text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* 스코어 보드 영역 */
+    .score-board-area {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin-bottom: 25px;
+    }
+    .score-card {
+        background: #f8fafc;
+        padding: 15px;
+        border-radius: var(--radius-lg);
+        text-align: center;
+        border: 2px solid var(--color-primary);
+        box-shadow: 0 4px 10px rgba(59, 130, 246, 0.1);
+    }
+    .score-label {
+        display: block;
+        font-size: 13px;
+        font-weight: 800;
+        color: var(--color-primary);
+        text-transform: uppercase;
+        margin-bottom: 5px;
+    }
+    .score-value {
+        display: block;
+        font-size: 32px;
+        font-weight: 900;
+        color: var(--color-text-main);
+    }
+    .btn-leaderboard {
+        background-color: var(--color-warning);
+        color: white;
+        border: none;
+        padding: 12px;
+        border-radius: var(--radius-lg);
+        font-size: 15px;
+        font-weight: 800;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        box-shadow: var(--shadow-sm);
+        transition: transform 0.1s, background-color 0.2s;
+    }
+    .btn-leaderboard:active { transform: scale(0.98); }
+    .btn-leaderboard:hover { background-color: #d97706; }
+
+    /* 컨트롤 패널 */
+    .control-panel {
+        background: #f1f5f9;
+        padding: 15px;
+        border-radius: var(--radius-lg);
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        border: 1px solid #e2e8f0;
+        margin-bottom: 20px;
+    }
+    .control-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+    .control-group label {
+        font-size: 12px;
+        font-weight: 700;
+        color: #475569;
+    }
+    select {
+        padding: 8px 10px;
+        border-radius: 6px;
+        border: 1px solid #cbd5e1;
+        font-size: 14px;
+        font-family: var(--font-main);
+        width: 100%;
+        background-color: white;
+        outline: none;
+    }
+    .btn-primary {
+        background-color: var(--color-primary);
+        color: white;
+        border: none;
+        padding: 14px;
+        border-radius: var(--radius-lg);
+        font-size: 16px;
+        font-weight: 800;
+        cursor: pointer;
+        box-shadow: var(--shadow-sm);
+        transition: transform 0.1s;
+        margin-top: 5px;
+    }
+    .btn-primary:active { transform: scale(0.98); }
+
+    /* 피드백 텍스트 */
+    .note-text-display {
+        font-size: 17px;
+        font-weight: 800;
+        color: var(--color-primary);
+        text-align: center;
+        min-height: 24px;
+        margin-bottom: 10px;
+        padding: 10px;
+        background: #eff6ff;
+        border-radius: 8px;
+    }
+
+    /* 섹션 레이아웃 */
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 2px solid #e2e8f0;
+        padding-bottom: 6px;
+        margin-bottom: 10px;
+    }
+    .section-label {
+        font-size: 14px;
+        font-weight: 800;
+        color: var(--color-text-muted);
+    }
+    .btn-outline {
+        background-color: transparent;
+        color: var(--color-primary);
+        border: 1px solid var(--color-primary);
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    /* 오선 악보 */
+    .staff-container {
+        position: relative;
+        height: 120px;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: center;
+        padding-top: 15px;
+    }
+    .staff-lines-bg {
+        position: relative;
+        width: 100%;
+        max-width: 350px;
+        height: 60px;
+    }
+    .staff-line {
+        position: absolute;
+        height: 2px;
+        background-color: var(--color-text-main);
+        width: 100%;
+        left: 0;
+    }
+    .clef {
+        position: absolute;
+        left: -30px;
+        top: -15px;
+        font-size: 75px;
+        font-family: serif;
+        color: var(--color-text-main);
+    }
+    .note-wrapper {
+        position: absolute; left: 50%; transform: translateX(-50%); z-index: 5;
+    }
+    .note-head {
+        position: absolute; width: 16px; height: 12px; background-color: var(--color-text-main);
+        border-radius: 50%; transform: rotate(-15deg); left: -8px; top: -6px;
+    }
+    .accidental {
+        position: absolute; left: -20px; top: -10px; font-size: 18px; font-weight: bold; font-family: serif;
+    }
+    .ledger-line {
+        position: absolute; left: 50%; transform: translateX(-50%); width: 30px; height: 2px; background-color: var(--color-text-main); z-index: 1;
+    }
+    .note-wrapper.solved .note-head, .note-wrapper.solved .accidental {
+        background-color: var(--color-success); color: var(--color-success);
+    }
+
+    /* 타브 악보 */
+    #tab-wrapper {
+        overflow: hidden;
+        transition: max-height 0.3s ease, opacity 0.3s ease, margin 0.3s ease;
+        max-height: 200px;
+        opacity: 1;
+        margin-bottom: 20px;
+    }
+    #tab-wrapper.hidden { max-height: 0; opacity: 0; margin-bottom: 0; }
+    
+    .tab-container {
+        position: relative; height: 90px; display: flex; flex-direction: column; justify-content: center; padding: 0 30px;
+    }
+    .tab-lines-bg {
+        position: relative; height: 75px; display: flex; flex-direction: column; justify-content: space-between; max-width: 350px; margin: 0 auto; width: 100%;
+    }
+    .tab-line { height: 1px; background-color: var(--color-text-muted); width: 100%; display: flex; align-items: center; }
+    .tab-line::before {
+        content: attr(data-string); position: absolute; left: -20px; font-size: 12px; font-weight: 700; color: var(--color-text-muted);
+    }
+    .tab-numbers-area { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+    .tab-number {
+        position: absolute; left: 50%; transform: translate(-50%, -50%);
+        background: var(--color-surface); padding: 0 4px; font-size: 14px; font-weight: 800; border-radius: 4px; z-index: 10;
+        box-shadow: 0 0 0 2px var(--color-surface);
+    }
+
+    /* 지판 */
+    .scroll-hint {
+        text-align: center; font-size: 12px; font-weight: 700; color: var(--color-warning);
+        margin-bottom: 8px; animation: pulseHint 2s infinite;
+    }
+    @media (min-width: 1024px) {
+        .scroll-hint { display: none; }
+    }
+    
+    .guitar-area-wrapper {
+        width: 100%; overflow-x: auto; padding-bottom: 10px;
+        -webkit-overflow-scrolling: touch;
+    }
+    .guitar-area-wrapper::-webkit-scrollbar { height: 8px; }
+    .guitar-area-wrapper::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 4px; }
+
+    .guitar-area { display: flex; flex-direction: column; min-width: 850px; }
+    .open-string-label {
+        position: relative; left: 80px; width: 40px; text-align: center;
+        font-size: 11px; font-weight: 800; color: var(--color-text-muted); margin-bottom: 4px;
+    }
+
+    .guitar-container {
+        display: flex; align-items: center; position: relative;
+        box-shadow: var(--shadow-md); border-radius: 12px;
+    }
+
+    .headstock {
+        width: 80px; height: 150px; background-color: var(--guitar-head);
+        border-radius: 12px 0 0 12px; border: 1px solid #b48554; position: relative; z-index: 2; flex-shrink: 0;
+    }
+    .nut { width: 6px; height: 150px; background: #f8fafc; border-right: 2px solid #94a3b8; border-left: 2px solid #cbd5e1; z-index: 3; flex-shrink: 0; }
+    
+    .peg { position: absolute; width: 12px; height: 20px; background: linear-gradient(to right, #f8fafc, #cbd5e1); border: 1px solid #94a3b8; }
+    .peg.top { top: -16px; border-radius: 4px 4px 0 0; } .peg.bottom { bottom: -16px; border-radius: 0 0 4px 4px; }
+    .peg-1 { left: 10px; } .peg-2 { left: 35px; } .peg-3 { left: 60px; }
+    .post { position: absolute; width: 8px; height: 8px; background: #94a3b8; border-radius: 50%; top: 50%; transform: translateY(-50%); }
+    .post-t1 { left: 12px; top: 25%; } .post-t2 { left: 37px; top: 25%; } .post-t3 { left: 62px; top: 25%; }
+    .post-b1 { left: 12px; top: 75%; } .post-b2 { left: 37px; top: 75%; } .post-b3 { left: 62px; top: 75%; }
+
+    .fretboard {
+        display: flex; height: 150px; flex-grow: 1; background: var(--guitar-neck);
+        border-top: 2px solid #111; border-bottom: 2px solid #111; position: relative; border-radius: 0 8px 8px 0; overflow: hidden;
+    }
+    .fret-column { flex: 1; border-right: 3px solid var(--guitar-frets); display: flex; flex-direction: column; position: relative; }
+    .fret-column:last-child { border-right: none; }
+    
+    .fret-column:nth-child(4)::after, .fret-column:nth-child(6)::after, .fret-column:nth-child(8)::after, .fret-column:nth-child(10)::after, .fret-column:nth-child(16)::after {
+        content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        width: 12px; height: 12px; background-color: rgba(255,255,255,0.8); border-radius: 50%; pointer-events: none; z-index: 1;
+    }
+    .fret-column:nth-child(13)::before, .fret-column:nth-child(13)::after {
+        content: ''; position: absolute; left: 50%; transform: translateX(-50%);
+        width: 10px; height: 10px; background-color: rgba(255,255,255,0.8); border-radius: 50%; pointer-events: none; z-index: 1;
+    }
+    .fret-column:nth-child(13)::before { top: 25%; } .fret-column:nth-child(13)::after { bottom: 25%; }
+    .fret-column.fret-0 { flex: 0.4; background-color: rgba(255,255,255,0.03); border-right: 1px solid rgba(255,255,255,0.1); }
+    .fret-column.fret-0::after { display: none; }
+
+    .string-cell { flex: 1; position: relative; cursor: pointer; z-index: 5; display: flex; align-items: center; justify-content: center; }
+    .string-cell:hover { background-color: rgba(255, 255, 255, 0.1); }
+    .open-number { position: absolute; color: rgba(255,255,255,0.4); font-weight: bold; font-size: 12px; pointer-events: none; }
+
+    .visual-string {
+        position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%);
+        background-color: var(--guitar-string); pointer-events: none; box-shadow: 0 1px 3px rgba(0,0,0,0.8); z-index: 2;
+    }
+    .visual-string-1 { height: 1px; } .visual-string-2 { height: 1.5px; } .visual-string-3 { height: 2px; }
+    .visual-string-4 { height: 2.5px; background: repeating-linear-gradient(90deg, #e2e8f0, #e2e8f0 2px, #94a3b8 2px, #94a3b8 4px); }
+    .visual-string-5 { height: 3px; background: repeating-linear-gradient(90deg, #e2e8f0, #e2e8f0 2px, #94a3b8 2px, #94a3b8 4px); }
+    .visual-string-6 { height: 4px; background: repeating-linear-gradient(90deg, #e2e8f0, #e2e8f0 2px, #94a3b8 2px, #94a3b8 4px); }
+
+    .realistic-finger {
+        position: absolute; width: 24px; background: linear-gradient(to right, #f6d3a8, #e5b078, #f6d3a8);
+        border-radius: 12px 12px 45% 45%; box-shadow: 2px 4px 10px rgba(0,0,0,0.6); z-index: 100; transform-origin: top center;
+        animation: dropFinger 0.15s ease-out forwards;
+    }
+    .realistic-nail {
+        position: absolute; bottom: 3px; left: 50%; transform: translateX(-50%); width: 14px; height: 16px;
+        background: #fae6ce; border-radius: 50% 50% 40% 40%; border: 1px solid #d49f57; box-shadow: inset 0 -1px 2px rgba(0,0,0,0.1);
+    }
+    .finger-joint { position: absolute; width: 60%; height: 2px; background: rgba(166, 107, 44, 0.3); left: 20%; border-radius: 50%; bottom: 30px; }
+    .finger-joint:nth-child(2) { bottom: 35px; width: 50%; left: 25%; }
+
+    .answer-marker {
+        position: absolute; width: 18px; height: 18px; background-color: rgba(239, 68, 68, 0.9);
+        border: 2px solid #b91c1c; border-radius: 50%; z-index: 20; pointer-events: none;
+        box-shadow: 0 0 12px rgba(239, 68, 68, 0.8); animation: pulse 1s infinite;
+    }
+
+    /* 리더보드 모달 */
+    .modal-overlay {
+        display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(15, 23, 42, 0.8); z-index: 1000; justify-content: center; align-items: center;
+        backdrop-filter: blur(4px);
+    }
+    .modal-content {
+        background: white; width: 90%; max-width: 450px; border-radius: var(--radius-xl);
+        padding: 25px; box-shadow: var(--shadow-lg); display: flex; flex-direction: column; max-height: 80vh;
+    }
+    .modal-header {
+        display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
+    }
+    .modal-header h2 { margin: 0; font-size: 22px; color: var(--color-text-main); }
+    .btn-close {
+        background: transparent; border: none; font-size: 24px; cursor: pointer; color: var(--color-text-muted);
+    }
+    .leaderboard-list {
+        overflow-y: auto; flex-grow: 1; padding-right: 5px;
+    }
+    .leaderboard-list::-webkit-scrollbar { width: 6px; }
+    .leaderboard-list::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+    
+    .lb-row {
+        display: flex; justify-content: space-between; align-items: center; padding: 12px 10px;
+        border-bottom: 1px solid #e2e8f0; font-size: 14px;
+    }
+    .lb-row.header { font-weight: 800; color: var(--color-text-muted); border-bottom: 2px solid #cbd5e1; }
+    .lb-row.my-row { background-color: #eff6ff; font-weight: 800; color: var(--color-primary); border-radius: 6px; }
+    .lb-rank { width: 40px; text-align: center; }
+    .lb-date { flex-grow: 1; text-align: center; }
+    .lb-score { width: 60px; text-align: right; font-weight: 800; }
+
+    @keyframes dropFinger { 0% { transform: scaleY(0); opacity: 0; } 100% { transform: scaleY(1); opacity: 1; } }
+    @keyframes pulse { 0% { transform: scale(0.9); opacity: 1; } 50% { transform: scale(1.3); opacity: 0.8; } 100% { transform: scale(0.9); opacity: 1; } }
+    @keyframes pulseHint { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+</style>
+</head>
+<body>
+
+<div class="game-container">
+    <div class="header-content">
+        <h1>Tab Master Pro</h1>
+        <p class="subtitle">Created by LemonTree Guitar Academy</p>
+    </div>
+
+    <div class="main-layout">
+        <!-- 왼쪽 패널 (조작부 & 점수) -->
+        <div class="left-panel">
+            <div class="score-board-area">
+                <div class="score-card">
+                    <span class="score-label">누적 점수</span>
+                    <span class="score-value" id="cumulative-score">0</span>
+                </div>
+                <button class="btn-leaderboard" onclick="openLeaderboard()">
+                    🏆 명예의 전당 보기
+                </button>
+            </div>
+            
+            <div class="control-panel">
+                <div class="control-group">
+                    <label>모드 설정</label>
+                    <select id="opt-mode">
+                        <option value="1">단일 음 (초보)</option>
+                        <option value="2">2화음 (중급)</option>
+                        <option value="3">3화음 (고급)</option>
+                        <option value="4">4화음 (마스터)</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label>프렛 훈련 범위</label>
+                    <select id="opt-range">
+                        <option value="0-4">0 ~ 4 프렛 (로우)</option>
+                        <option value="5-9">5 ~ 9 프렛 (미들)</option>
+                        <option value="10-15">10 ~ 15 프렛 (하이)</option>
+                        <option value="0-15" selected>0 ~ 15 전체 프렛</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label>임시표(#) 포함</label>
+                    <select id="opt-acc">
+                        <option value="natural">조표 없음 (다장조)</option>
+                        <option value="all">모든 음 (# 포함)</option>
+                    </select>
+                </div>
+                <button id="btn-start" class="btn-primary">시작하기</button>
+            </div>
+            
+            <!-- 데스크탑에서는 좌측 텍스트로 사용 -->
+            <div class="note-text-display" id="note-text">옵션을 선택하고 시작 버튼을 누르세요.</div>
+        </div>
+
+        <!-- 오른쪽 패널 (악보 & 지판) -->
+        <div class="right-panel">
+            <div class="section-header">
+                <span class="section-label">오선 악보 (Standard Notation)</span>
+            </div>
+            <div class="staff-container">
+                <div class="staff-lines-bg" id="staff-lines-bg">
+                    <div class="staff-line" style="top: 0px;"></div>
+                    <div class="staff-line" style="top: 15px;"></div>
+                    <div class="staff-line" style="top: 30px;"></div>
+                    <div class="staff-line" style="top: 45px;"></div>
+                    <div class="staff-line" style="top: 60px;"></div>
+                    <div class="clef">&#119070;</div>
+                    <div id="staff-notes-area"></div>
+                </div>
+            </div>
+
+            <div id="tab-wrapper">
+                <div class="section-header">
+                    <span class="section-label">타브 악보 (TAB)</span>
+                    <button id="btn-toggle-tab" class="btn-outline">숨기기</button>
+                </div>
+                <div class="tab-container" id="tab-container">
+                    <div class="tab-lines-bg">
+                        <div class="tab-line" data-string="e"></div>
+                        <div class="tab-line" data-string="B"></div>
+                        <div class="tab-line" data-string="G"></div>
+                        <div class="tab-line" data-string="D"></div>
+                        <div class="tab-line" data-string="A"></div>
+                        <div class="tab-line" data-string="E"></div>
+                        <div class="tab-numbers-area" id="tab-numbers-area"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-header">
+                <span class="section-label">프렛보드 (클릭하여 연주)</span>
+            </div>
+            <div class="scroll-hint">↔ 가로로 스크롤하여 전체 지판을 확인하세요</div>
+            <div class="guitar-area-wrapper">
+                <div class="guitar-area">
+                    <div class="open-string-label">개방현</div>
+                    <div class="guitar-container">
+                        <div class="headstock">
+                            <div class="peg top peg-1"></div><div class="peg top peg-2"></div><div class="peg top peg-3"></div>
+                            <div class="peg bottom peg-1"></div><div class="peg bottom peg-2"></div><div class="peg bottom peg-3"></div>
+                            <div class="post post-t1"></div><div class="post post-t2"></div><div class="post post-t3"></div>
+                            <div class="post post-b1"></div><div class="post post-b2"></div><div class="post post-b3"></div>
+                        </div>
+                        <div class="nut"></div>
+                        <div class="fretboard" id="fretboard"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 명예의 전당 모달 -->
+<div class="modal-overlay" id="leaderboard-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>🏆 명예의 전당</h2>
+            <button class="btn-close" onclick="closeLeaderboard()">&times;</button>
+        </div>
+        <div class="leaderboard-list">
+            <div class="lb-row header">
+                <span class="lb-rank">순위</span>
+                <span class="lb-date">달성 일시</span>
+                <span class="lb-score">점수</span>
+            </div>
+            <div id="lb-content">
+                <!-- JS로 리스트 주입 -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    // --- Firebase & 리더보드/점수 로직 ---
+    let db, auth;
+    let currentUser = null;
+    let cumulativeScore = 0;
+    let appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+    const cumulativeScoreEl = document.getElementById('cumulative-score');
+    const lbContentEl = document.getElementById('lb-content');
+    const modalEl = document.getElementById('leaderboard-modal');
+    
+    let lbUnsubscribe = null;
+
+    async function initFirebase() {
+        try {
+            if (typeof __firebase_config === 'undefined') {
+                console.warn("로컬 환경. 클라우드 기능 비활성화");
+                return;
+            }
+            const firebaseConfig = JSON.parse(__firebase_config);
+            const app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+
+            // Rule 3: Auth First
+            const initAuth = async () => {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            };
+            await initAuth();
+
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    currentUser = user;
+                    // 자신의 누적 점수 실시간 연동 (리더보드 컬렉션 내 본인 문서)
+                    const myLbRef = doc(db, 'artifacts', appId, 'public', 'data', 'leaderboard', user.uid);
+                    onSnapshot(myLbRef, (docSnap) => {
+                        if (docSnap.exists()) {
+                            cumulativeScore = docSnap.data().score || 0;
+                            cumulativeScoreEl.textContent = cumulativeScore;
+                        }
+                    }, (error) => console.error(error));
+                }
+            });
+        } catch (e) {
+            console.error("Firebase init failed:", e);
+        }
+    }
+
+    function addCumulativeScore(points) {
+        cumulativeScore += points;
+        cumulativeScoreEl.textContent = cumulativeScore;
+        
+        if (currentUser && db) {
+            const now = new Date();
+            // 포맷: YY.MM.DD HH:mm
+            const dateStr = `${now.getFullYear().toString().slice(2)}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+            
+            const lbRef = doc(db, 'artifacts', appId, 'public', 'data', 'leaderboard', currentUser.uid);
+            setDoc(lbRef, {
+                score: cumulativeScore,
+                updatedAt: dateStr,
+                timestamp: now.getTime()
+            }, { merge: true });
+        }
+    }
+
+    window.openLeaderboard = function() {
+        modalEl.style.display = 'flex';
+        if (!currentUser || !db) {
+            lbContentEl.innerHTML = '<div style="text-align:center; padding: 20px;">서버 연결 중이거나 오프라인입니다.</div>';
+            return;
+        }
+
+        const lbCol = collection(db, 'artifacts', appId, 'public', 'data', 'leaderboard');
+        // Rule 2: 전체 가져와서 JS 메모리에서 정렬
+        lbUnsubscribe = onSnapshot(lbCol, (snapshot) => {
+            let records = [];
+            snapshot.forEach(doc => records.push({ id: doc.id, ...doc.data() }));
+            
+            // 점수 내림차순, 같으면 최신순
+            records.sort((a, b) => b.score - a.score || b.timestamp - a.timestamp);
+            
+            // 상위 30명
+            const topRecords = records.slice(0, 30);
+            
+            lbContentEl.innerHTML = topRecords.map((r, i) => `
+                <div class="lb-row ${r.id === currentUser.uid ? 'my-row' : ''}">
+                    <span class="lb-rank">${i + 1}</span>
+                    <span class="lb-date">${r.updatedAt || '-'}</span>
+                    <span class="lb-score">${r.score}</span>
+                </div>
+            `).join('');
+
+            if(records.length === 0) {
+                lbContentEl.innerHTML = '<div style="text-align:center; padding: 20px;">아직 기록이 없습니다. 첫 번째로 점수를 올려보세요!</div>';
+            }
+        }, (error) => {
+            console.error("Leaderboard fetch error", error);
+            lbContentEl.innerHTML = '<div style="text-align:center; padding: 20px;">데이터를 불러오는 중 오류가 발생했습니다.</div>';
+        });
+    }
+
+    window.closeLeaderboard = function() {
+        modalEl.style.display = 'none';
+        if (lbUnsubscribe) lbUnsubscribe();
+    }
+
+    // --- 게임 로직 ---
+    const stringBaseMidi = [null, 64, 59, 55, 50, 45, 40]; 
+    const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+    const stepBase = { 'C': 0, 'D': 1, 'E': 2, 'F': 3, 'G': 4, 'A': 5, 'B': 6 };
+    const TOTAL_FRETS = 15;
+    const MAX_FRET_STRETCH = 3;
+
+    let currentProblem = [];
+    let isProcessing = false;
+    let isTabHidden = false;
+    let currentProblemPoints = 0;
+
+    const fretboardEl = document.getElementById('fretboard');
+    const staffNotesAreaEl = document.getElementById('staff-notes-area');
+    const tabNumbersAreaEl = document.getElementById('tab-numbers-area');
+    const tabWrapperEl = document.getElementById('tab-wrapper');
+    const noteTextEl = document.getElementById('note-text');
+    const btnToggleTab = document.getElementById('btn-toggle-tab');
+    const btnStart = document.getElementById('btn-start');
+
+    btnToggleTab.addEventListener('click', () => {
+        isTabHidden = !isTabHidden;
+        if (isTabHidden) {
+            tabWrapperEl.classList.add('hidden');
+            btnToggleTab.textContent = '보이기';
+        } else {
+            tabWrapperEl.classList.remove('hidden');
+            btnToggleTab.textContent = '숨기기';
+        }
+    });
+
+    btnStart.addEventListener('click', () => {
+        startNewProblem();
+    });
+
+    function initFretboard() {
+        fretboardEl.innerHTML = '';
+        for (let f = 0; f <= TOTAL_FRETS; f++) {
+            const fretCol = document.createElement('div');
+            fretCol.className = `fret-column fret-${f}`;
+            for (let s = 1; s <= 6; s++) {
+                const cell = document.createElement('div');
+                cell.className = 'string-cell';
+                cell.dataset.string = s;
+                cell.dataset.fret = f;
+                
+                const vString = document.createElement('div');
+                vString.className = `visual-string visual-string-${s}`;
+                cell.appendChild(vString);
+
+                if (f === 0) {
+                    const openNum = document.createElement('div');
+                    openNum.className = 'open-number';
+                    openNum.textContent = '0';
+                    cell.appendChild(openNum);
+                }
+
+                cell.addEventListener('click', () => handleFretClick(s, f, cell));
+                fretCol.appendChild(cell);
+            }
+            fretboardEl.appendChild(fretCol);
+        }
+    }
+
+    function getNoteInfo(midi) {
+        const noteIndex = midi % 12;
+        const noteName = noteNames[noteIndex];
+        const baseLetter = noteName[0];
+        const isSharp = noteName.includes('#');
+        const guitarOctave = Math.floor(midi / 12) - 1;
+        const notationOctave = guitarOctave + 1;
+        const step = stepBase[baseLetter] + (notationOctave - 4) * 7;
+        const y = 75 - (step * 7.5);
+        return { midi, noteName, isSharp, y, fullName: `${noteName}${notationOctave}` };
+    }
+
+    function calculatePoints(numNotes, allowAccidentals, isHidden) {
+        let base = 10;
+        let multiplier = numNotes; 
+        if (allowAccidentals) multiplier *= 1.5; 
+        if (isHidden) multiplier *= 2.0; 
+        return Math.ceil(base * multiplier);
+    }
+
+    function startNewProblem() {
+        if(isProcessing) return;
+        clearFingers();
+        clearMarkers();
+        noteTextEl.style.color = 'var(--color-primary)';
+        
+        const numNotes = parseInt(document.getElementById('opt-mode').value);
+        const range = document.getElementById('opt-range').value.split('-').map(Number);
+        const allowAccidentals = document.getElementById('opt-acc').value === 'all';
+        
+        currentProblemPoints = calculatePoints(numNotes, allowAccidentals, isTabHidden);
+
+        let targets = [];
+        let attempts = 0;
+        const minFretInRange = range[0] === 0 ? 1 : range[0];
+        const maxFretBase = Math.max(minFretInRange, range[1] - MAX_FRET_STRETCH);
+
+        while (attempts < 1000) {
+            attempts++;
+            let handBase = Math.floor(Math.random() * (maxFretBase - minFretInRange + 1)) + minFretInRange;
+            
+            let allowedFrets = [];
+            if (range[0] === 0) allowedFrets.push(0);
+            for (let f = handBase; f <= handBase + MAX_FRET_STRETCH; f++) {
+                if (f <= range[1]) allowedFrets.push(f);
+            }
+
+            let notePool = [];
+            for (let s = 1; s <= 6; s++) {
+                for (let f of allowedFrets) {
+                    let midi = stringBaseMidi[s] + f;
+                    let info = getNoteInfo(midi);
+                    if (!allowAccidentals && info.isSharp) continue;
+                    notePool.push({ string: s, fret: f, info: info });
+                }
+            }
+
+            let selectedStrings = [1, 2, 3, 4, 5, 6].sort(() => Math.random() - 0.5);
+            targets = [];
+            
+            for (let s of selectedStrings) {
+                let optionsForString = notePool.filter(n => n.string === s);
+                if (optionsForString.length > 0) {
+                    let choice = optionsForString[Math.floor(Math.random() * optionsForString.length)];
+                    targets.push({ ...choice, solved: false });
+                }
+                if (targets.length === numNotes) break;
+            }
+
+            if (targets.length === numNotes) {
+                let uniquePitches = new Set(targets.map(t => t.info.midi));
+                if (uniquePitches.size === numNotes) break;
+            }
+        }
+
+        currentProblem = targets.sort((a, b) => b.info.y - a.info.y);
+        renderProblem();
+        
+        const namesText = currentProblem.map(t => t.info.fullName).join(', ');
+        noteTextEl.textContent = `목표 음: ${namesText} (+${currentProblemPoints}점)`;
+    }
+
+    function renderProblem() {
+        staffNotesAreaEl.innerHTML = '';
+        tabNumbersAreaEl.innerHTML = '';
+        
+        const yValues = currentProblem.map(t => t.info.y);
+        const maxY = Math.max(...yValues);
+        const minY = Math.min(...yValues);
+
+        for (let l = 75; l <= maxY + 1; l += 15) {
+            staffNotesAreaEl.innerHTML += `<div class="ledger-line" style="top: ${l}px;"></div>`;
+        }
+        for (let l = -15; l >= minY - 1; l -= 15) {
+            staffNotesAreaEl.innerHTML += `<div class="ledger-line" style="top: ${l}px;"></div>`;
+        }
+
+        currentProblem.forEach((target, index) => {
+            const y = target.info.y;
+            let noteHtml = `
+                <div class="note-wrapper" id="note-${index}" style="top: ${y}px;">
+                    <div class="note-head"></div>
+                    ${target.info.isSharp ? `<div class="accidental">#</div>` : ''}
+                </div>
+            `;
+            staffNotesAreaEl.innerHTML += noteHtml;
+
+            const tabY = (target.string - 1) * 15; 
+            let tabHtml = `<div class="tab-number" id="tab-${index}" style="top: ${tabY}px;">${target.fret}</div>`;
+            tabNumbersAreaEl.innerHTML += tabHtml;
+        });
+    }
+
+    function handleFretClick(s, f, cellElement) {
+        if (currentProblem.length === 0 || isProcessing) return;
+
+        const clickedMidi = stringBaseMidi[s] + f;
+
+        const targetIndex = currentProblem.findIndex(t => {
+            if (t.solved) return false;
+            if (isTabHidden) return t.info.midi === clickedMidi; 
+            return t.string === s && t.fret === f; 
+        });
+
+        if (targetIndex !== -1) {
+            // 정답
+            currentProblem[targetIndex].solved = true;
+            document.getElementById(`note-${targetIndex}`).classList.add('solved');
+            
+            const tabEl = document.getElementById(`tab-${targetIndex}`);
+            if(tabEl) {
+                tabEl.style.color = "var(--color-success)";
+                if (isTabHidden) tabEl.textContent = f; 
+            }
+            
+            drawRealisticFinger(cellElement, s);
+
+            if (currentProblem.every(t => t.solved)) {
+                isProcessing = true;
+                noteTextEl.textContent = `정답! 🎉 (+${currentProblemPoints}점)`;
+                noteTextEl.style.color = "var(--color-success)";
+                
+                // 누적 점수 증가 및 DB 저장
+                addCumulativeScore(currentProblemPoints); 
+                
+                setTimeout(() => {
+                    isProcessing = false;
+                    startNewProblem();
+                }, 1000);
+            }
+
+        } else {
+            // 오답 (틀려도 점수는 깎이지 않고 문제만 새로 출제됨)
+            isProcessing = true;
+            noteTextEl.textContent = "오답! 괜찮아요, 다시 도전하세요. 😅";
+            noteTextEl.style.color = "var(--color-error)";
+            
+            clearFingers();
+            showAnswerMarkers(isTabHidden);
+
+            setTimeout(() => {
+                isProcessing = false;
+                startNewProblem();
+            }, 2500);
+        }
+    }
+
+    function showAnswerMarkers(isHiddenMode) {
+        currentProblem.forEach(target => {
+            if (isHiddenMode) {
+                const targetMidi = target.info.midi;
+                for (let str = 1; str <= 6; str++) {
+                    for (let frt = 0; frt <= TOTAL_FRETS; frt++) {
+                        if (stringBaseMidi[str] + frt === targetMidi) {
+                            drawMarkerAt(str, frt);
+                        }
+                    }
+                }
+            } else {
+                drawMarkerAt(target.string, target.fret);
+            }
+        });
+    }
+
+    function drawMarkerAt(s, f) {
+        const cell = document.querySelector(`.string-cell[data-string="${s}"][data-fret="${f}"]`);
+        if (cell && !cell.querySelector('.answer-marker')) {
+            const marker = document.createElement('div');
+            marker.className = 'answer-marker';
+            cell.appendChild(marker);
+        }
+    }
+
+    function drawRealisticFinger(cellElement, stringNum) {
+        if(cellElement.querySelector('.realistic-finger')) return;
+
+        const finger = document.createElement('div');
+        finger.className = 'realistic-finger';
+        finger.innerHTML = `<div class="finger-joint"></div><div class="finger-joint"></div><div class="realistic-nail"></div>`;
+
+        const fretboardRect = fretboardEl.getBoundingClientRect();
+        const cellRect = cellElement.getBoundingClientRect();
+        
+        const relativeX = (cellRect.left - fretboardRect.left) + (cellRect.width / 2);
+        const targetY = (cellRect.top - fretboardRect.top) + (cellRect.height / 2);
+
+        const startY = -30; 
+        const fingerHeight = targetY - startY + 8; 
+
+        finger.style.left = `${relativeX - 12}px`;
+        finger.style.top = `${startY}px`;
+        finger.style.height = `${fingerHeight}px`;
+
+        fretboardEl.appendChild(finger);
+    }
+
+    function clearFingers() { document.querySelectorAll('.realistic-finger').forEach(f => f.remove()); }
+    function clearMarkers() { document.querySelectorAll('.answer-marker').forEach(m => m.remove()); }
+
+    // 부팅
+    initFretboard();
+    initFirebase();
+
+</script>
+</body>
+</html>
+
+

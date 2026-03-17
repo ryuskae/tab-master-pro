@@ -635,14 +635,15 @@
             } else {
                 // 🚨 선생님의 깃허브 페이지 (외부 호스팅) 환경인 경우 🚨
                 // 아래 항목을 지우고, 선생님의 Firebase 콘솔에서 복사한 설정값으로 교체해야 합니다.
-                firebaseConfig = {
-                    apiKey: "여기에_API_KEY_입력",
-                    authDomain: "여기에_authDomain_입력",
-                    projectId: "여기에_projectId_입력",
-                    storageBucket: "여기에_storageBucket_입력",
-                    messagingSenderId: "여기에_messagingSenderId_입력",
-                    appId: "여기에_appId_입력"
-                };
+                const firebaseConfig = {
+  apiKey: "AIzaSyBVekwRGNfVGLdj83ADl_ZYgjy0TJAX488",
+  authDomain: "tab-master-pro.firebaseapp.com",
+  projectId: "tab-master-pro",
+  storageBucket: "tab-master-pro.firebasestorage.app",
+  messagingSenderId: "244497430147",
+  appId: "1:244497430147:web:7845403169f11b9eb40db6",
+  measurementId: "G-KG1E89RSDT"
+};
             }
 
             // 만약 선생님이 설정값을 아직 입력하지 않았다면 (기본값 그대로라면) 오프라인 모드로 전환

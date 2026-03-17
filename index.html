@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Tab Master Pro - LemonTree Guitar</title>
-<!-- 모던한 웹 폰트 -->
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
 <style>
     :root {
@@ -449,7 +448,7 @@
         display: flex; justify-content: space-between; align-items: center; padding: 12px 10px;
         border-bottom: 1px solid #e2e8f0; font-size: 14px;
     }
-    .lb-row.header { font-weight: 800; color: var(--color-text-muted); border-bottom: 2px solid #cbd5e1; }
+    .lb-row header { font-weight: 800; color: var(--color-text-muted); border-bottom: 2px solid #cbd5e1; }
     .lb-row.my-row { background-color: #eff6ff; font-weight: 800; color: var(--color-primary); border-radius: 6px; }
     .lb-rank { width: 40px; text-align: center; }
     .lb-date { flex-grow: 1; text-align: center; }
@@ -476,7 +475,6 @@
     </div>
 
     <div class="main-layout">
-        <!-- 왼쪽 패널 (조작부 & 점수) -->
         <div class="left-panel">
             
             <div id="db-warning" class="db-warning">
@@ -522,11 +520,9 @@
                 <button id="btn-start" class="btn-primary">시작하기</button>
             </div>
             
-            <!-- 피드백 텍스트 (정답/오답) -->
             <div class="note-text-display" id="note-text">옵션을 선택하고 시작 버튼을 누르세요.</div>
         </div>
 
-        <!-- 오른쪽 패널 (악보 & 지판) -->
         <div class="right-panel">
             <div class="section-header">
                 <span class="section-label">오선 악보 (Standard Notation)</span>
@@ -584,7 +580,6 @@
     </div>
 </div>
 
-<!-- 명예의 전당 모달 -->
 <div class="modal-overlay" id="leaderboard-modal">
     <div class="modal-content">
         <div class="modal-header">
@@ -598,8 +593,7 @@
                 <span class="lb-score">누적 점수</span>
             </div>
             <div id="lb-content">
-                <!-- JS로 리스트 주입 -->
-            </div>
+                </div>
         </div>
     </div>
 </div>
@@ -629,43 +623,37 @@
 
             // 1. 설정값 확인
             if (typeof __firebase_config !== 'undefined') {
-                // 제 내부 테스트 환경인 경우
                 firebaseConfig = JSON.parse(__firebase_config);
                 appId = typeof __app_id !== 'undefined' ? __app_id : appId;
             } else {
-                // 🚨 선생님의 깃허브 페이지 (외부 호스팅) 환경인 경우 🚨
-                // 아래 항목을 지우고, 선생님의 Firebase 콘솔에서 복사한 설정값으로 교체해야 합니다.
-                const firebaseConfig = {
-  apiKey: "AIzaSyBVekwRGNfVGLdj83ADl_ZYgjy0TJAX488",
-  authDomain: "tab-master-pro.firebaseapp.com",
-  projectId: "tab-master-pro",
-  storageBucket: "tab-master-pro.firebasestorage.app",
-  messagingSenderId: "244497430147",
-  appId: "1:244497430147:web:7845403169f11b9eb40db6",
-  measurementId: "G-KG1E89RSDT"
-};
+                // ✅ 수정된 부분: const를 제거하여 상위 변수에 정상 할당
+                firebaseConfig = {
+                    apiKey: "AIzaSyBVekwRGNfVGLdj83ADl_ZYgjy0TJAX488",
+                    authDomain: "tab-master-pro.firebaseapp.com",
+                    projectId: "tab-master-pro",
+                    storageBucket: "tab-master-pro.firebasestorage.app",
+                    messagingSenderId: "244497430147",
+                    appId: "1:244497430147:web:7845403169f11b9eb40db6",
+                    measurementId: "G-KG1E89RSDT"
+                };
             }
 
-            // 만약 선생님이 설정값을 아직 입력하지 않았다면 (기본값 그대로라면) 오프라인 모드로 전환
             if (firebaseConfig.apiKey === "여기에_API_KEY_입력") {
                 isOfflineMode = true;
                 dbWarningEl.style.display = 'block';
                 return;
             }
 
-            // 2. 파이어베이스 초기화
             const app = initializeApp(firebaseConfig);
             auth = getAuth(app);
             db = getFirestore(app);
 
-            // 3. 익명 로그인 실행 (학생 고유 ID 생성 목적)
             if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                 await signInWithCustomToken(auth, __initial_auth_token);
             } else {
                 await signInAnonymously(auth);
             }
 
-            // 4. 로그인 완료 시 본인 점수 실시간 연동
             onAuthStateChanged(auth, (user) => {
                 if (user) {
                     currentUser = user;
@@ -685,21 +673,16 @@
         }
     }
 
-    // --- 점수 올리기 ---
     function addCumulativeScore(points) {
         cumulativeScore += points;
         cumulativeScoreEl.textContent = cumulativeScore;
         
-        if (isOfflineMode) {
-            // 오프라인 모드일때는 새로고침 하면 날아갑니다.
-            return;
-        }
+        if (isOfflineMode) return;
 
         if (currentUser && db) {
             const now = new Date();
             const dateStr = `${now.getFullYear().toString().slice(2)}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
             
-            // 기존 문서(사용자 UID)에 덮어쓰기 -> 중복 방지
             const lbRef = doc(db, 'artifacts', appId, 'public', 'data', 'leaderboard', currentUser.uid);
             setDoc(lbRef, {
                 score: cumulativeScore,
@@ -709,7 +692,6 @@
         }
     }
 
-    // --- 명예의 전당 팝업 ---
     window.openLeaderboard = function() {
         modalEl.style.display = 'flex';
         
@@ -728,11 +710,8 @@
         lbUnsubscribe = onSnapshot(lbCol, (snapshot) => {
             let records = [];
             snapshot.forEach(doc => records.push({ id: doc.id, ...doc.data() }));
-            
-            // 점수 내림차순 정렬
             records.sort((a, b) => b.score - a.score || b.timestamp - a.timestamp);
-            
-            const topRecords = records.slice(0, 50); // 상위 50명만
+            const topRecords = records.slice(0, 50);
             
             lbContentEl.innerHTML = topRecords.map((r, i) => `
                 <div class="lb-row ${r.id === currentUser.uid ? 'my-row' : ''}">
@@ -756,7 +735,6 @@
         if (lbUnsubscribe) lbUnsubscribe();
     }
 
-    // --- 게임 핵심 로직 ---
     const stringBaseMidi = [null, 64, 59, 55, 50, 45, 40]; 
     const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
     const stepBase = { 'C': 0, 'D': 1, 'E': 2, 'F': 3, 'G': 4, 'A': 5, 'B': 6 };
@@ -787,9 +765,7 @@
         }
     });
 
-    btnStart.addEventListener('click', () => {
-        startNewProblem();
-    });
+    btnStart.addEventListener('click', () => startNewProblem());
 
     function initFretboard() {
         fretboardEl.innerHTML = '';
@@ -801,18 +777,15 @@
                 cell.className = 'string-cell';
                 cell.dataset.string = s;
                 cell.dataset.fret = f;
-                
                 const vString = document.createElement('div');
                 vString.className = `visual-string visual-string-${s}`;
                 cell.appendChild(vString);
-
                 if (f === 0) {
                     const openNum = document.createElement('div');
                     openNum.className = 'open-number';
                     openNum.textContent = '0';
                     cell.appendChild(openNum);
                 }
-
                 cell.addEventListener('click', () => handleFretClick(s, f, cell));
                 fretCol.appendChild(cell);
             }
@@ -845,13 +818,10 @@
         clearFingers();
         clearMarkers();
         noteTextEl.style.color = 'var(--color-primary)';
-        
         const numNotes = parseInt(document.getElementById('opt-mode').value);
         const range = document.getElementById('opt-range').value.split('-').map(Number);
         const allowAccidentals = document.getElementById('opt-acc').value === 'all';
-        
         currentProblemPoints = calculatePoints(numNotes, allowAccidentals, isTabHidden);
-
         let targets = [];
         let attempts = 0;
         const minFretInRange = range[0] === 0 ? 1 : range[0];
@@ -860,13 +830,11 @@
         while (attempts < 1000) {
             attempts++;
             let handBase = Math.floor(Math.random() * (maxFretBase - minFretInRange + 1)) + minFretInRange;
-            
             let allowedFrets = [];
             if (range[0] === 0) allowedFrets.push(0);
             for (let f = handBase; f <= handBase + MAX_FRET_STRETCH; f++) {
                 if (f <= range[1]) allowedFrets.push(f);
             }
-
             let notePool = [];
             for (let s = 1; s <= 6; s++) {
                 for (let f of allowedFrets) {
@@ -876,10 +844,8 @@
                     notePool.push({ string: s, fret: f, info: info });
                 }
             }
-
             let selectedStrings = [1, 2, 3, 4, 5, 6].sort(() => Math.random() - 0.5);
             targets = [];
-            
             for (let s of selectedStrings) {
                 let optionsForString = notePool.filter(n => n.string === s);
                 if (optionsForString.length > 0) {
@@ -888,16 +854,13 @@
                 }
                 if (targets.length === numNotes) break;
             }
-
             if (targets.length === numNotes) {
                 let uniquePitches = new Set(targets.map(t => t.info.midi));
                 if (uniquePitches.size === numNotes) break;
             }
         }
-
         currentProblem = targets.sort((a, b) => b.info.y - a.info.y);
         renderProblem();
-        
         const namesText = currentProblem.map(t => t.info.fullName).join(', ');
         noteTextEl.textContent = `목표 음: ${namesText} (+${currentProblemPoints}점)`;
     }
@@ -905,85 +868,55 @@
     function renderProblem() {
         staffNotesAreaEl.innerHTML = '';
         tabNumbersAreaEl.innerHTML = '';
-        
         const yValues = currentProblem.map(t => t.info.y);
         const maxY = Math.max(...yValues);
         const minY = Math.min(...yValues);
-
         for (let l = 75; l <= maxY + 1; l += 15) {
             staffNotesAreaEl.innerHTML += `<div class="ledger-line" style="top: ${l}px;"></div>`;
         }
         for (let l = -15; l >= minY - 1; l -= 15) {
             staffNotesAreaEl.innerHTML += `<div class="ledger-line" style="top: ${l}px;"></div>`;
         }
-
         currentProblem.forEach((target, index) => {
             const y = target.info.y;
-            let noteHtml = `
+            staffNotesAreaEl.innerHTML += `
                 <div class="note-wrapper" id="note-${index}" style="top: ${y}px;">
                     <div class="note-head"></div>
                     ${target.info.isSharp ? `<div class="accidental">#</div>` : ''}
-                </div>
-            `;
-            staffNotesAreaEl.innerHTML += noteHtml;
-
+                </div>`;
             const tabY = (target.string - 1) * 15; 
-            let tabHtml = `<div class="tab-number" id="tab-${index}" style="top: ${tabY}px;">${target.fret}</div>`;
-            tabNumbersAreaEl.innerHTML += tabHtml;
+            tabNumbersAreaEl.innerHTML += `<div class="tab-number" id="tab-${index}" style="top: ${tabY}px;">${target.fret}</div>`;
         });
     }
 
     function handleFretClick(s, f, cellElement) {
         if (currentProblem.length === 0 || isProcessing) return;
-
         const clickedMidi = stringBaseMidi[s] + f;
-
         const targetIndex = currentProblem.findIndex(t => {
             if (t.solved) return false;
-            if (isTabHidden) return t.info.midi === clickedMidi; 
-            return t.string === s && t.fret === f; 
+            return isTabHidden ? t.info.midi === clickedMidi : (t.string === s && t.fret === f);
         });
 
         if (targetIndex !== -1) {
-            // 정답
             currentProblem[targetIndex].solved = true;
             document.getElementById(`note-${targetIndex}`).classList.add('solved');
-            
             const tabEl = document.getElementById(`tab-${targetIndex}`);
-            if(tabEl) {
-                tabEl.style.color = "var(--color-success)";
-                if (isTabHidden) tabEl.textContent = f; 
-            }
-            
+            if(tabEl) { tabEl.style.color = "var(--color-success)"; if (isTabHidden) tabEl.textContent = f; }
             drawRealisticFinger(cellElement, s);
-
             if (currentProblem.every(t => t.solved)) {
                 isProcessing = true;
                 noteTextEl.textContent = `정답! 🎉 (+${currentProblemPoints}점)`;
                 noteTextEl.style.color = "var(--color-success)";
-                
-                // 점수 추가 및 클라우드 저장
                 addCumulativeScore(currentProblemPoints); 
-                
-                setTimeout(() => {
-                    isProcessing = false;
-                    startNewProblem();
-                }, 1000);
+                setTimeout(() => { isProcessing = false; startNewProblem(); }, 1000);
             }
-
         } else {
-            // 오답
             isProcessing = true;
             noteTextEl.textContent = "오답! 괜찮아요, 다시 도전하세요. 😅";
             noteTextEl.style.color = "var(--color-error)";
-            
             clearFingers();
             showAnswerMarkers(isTabHidden);
-
-            setTimeout(() => {
-                isProcessing = false;
-                startNewProblem();
-            }, 2500);
+            setTimeout(() => { isProcessing = false; startNewProblem(); }, 2500);
         }
     }
 
@@ -993,14 +926,10 @@
                 const targetMidi = target.info.midi;
                 for (let str = 1; str <= 6; str++) {
                     for (let frt = 0; frt <= TOTAL_FRETS; frt++) {
-                        if (stringBaseMidi[str] + frt === targetMidi) {
-                            drawMarkerAt(str, frt);
-                        }
+                        if (stringBaseMidi[str] + frt === targetMidi) drawMarkerAt(str, frt);
                     }
                 }
-            } else {
-                drawMarkerAt(target.string, target.fret);
-            }
+            } else { drawMarkerAt(target.string, target.fret); }
         });
     }
 
@@ -1015,36 +944,26 @@
 
     function drawRealisticFinger(cellElement, stringNum) {
         if(cellElement.querySelector('.realistic-finger')) return;
-
         const finger = document.createElement('div');
         finger.className = 'realistic-finger';
         finger.innerHTML = `<div class="finger-joint"></div><div class="finger-joint"></div><div class="realistic-nail"></div>`;
-
         const fretboardRect = fretboardEl.getBoundingClientRect();
         const cellRect = cellElement.getBoundingClientRect();
-        
         const relativeX = (cellRect.left - fretboardRect.left) + (cellRect.width / 2);
         const targetY = (cellRect.top - fretboardRect.top) + (cellRect.height / 2);
-
         const startY = -30; 
         const fingerHeight = targetY - startY + 8; 
-
         finger.style.left = `${relativeX - 12}px`;
         finger.style.top = `${startY}px`;
         finger.style.height = `${fingerHeight}px`;
-
         fretboardEl.appendChild(finger);
     }
 
     function clearFingers() { document.querySelectorAll('.realistic-finger').forEach(f => f.remove()); }
     function clearMarkers() { document.querySelectorAll('.answer-marker').forEach(m => m.remove()); }
 
-    // 부팅
     initFretboard();
     initFirebase();
-
 </script>
 </body>
 </html>
-
-

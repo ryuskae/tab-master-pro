@@ -455,6 +455,13 @@
     .lb-date { flex-grow: 1; text-align: center; }
     .lb-score { width: 60px; text-align: right; font-weight: 800; }
 
+    /* 연결 오류 메시지 디자인 */
+    .db-warning {
+        background: #fee2e2; color: #b91c1c; padding: 10px; text-align: center;
+        font-size: 13px; font-weight: 700; border-radius: 8px; margin-bottom: 15px;
+        display: none;
+    }
+
     @keyframes dropFinger { 0% { transform: scaleY(0); opacity: 0; } 100% { transform: scaleY(1); opacity: 1; } }
     @keyframes pulse { 0% { transform: scale(0.9); opacity: 1; } 50% { transform: scale(1.3); opacity: 0.8; } 100% { transform: scale(0.9); opacity: 1; } }
     @keyframes pulseHint { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
@@ -471,6 +478,11 @@
     <div class="main-layout">
         <!-- 왼쪽 패널 (조작부 & 점수) -->
         <div class="left-panel">
+            
+            <div id="db-warning" class="db-warning">
+                ⚠️ 외부 서버(Firebase) 연결이 필요합니다.<br>점수가 기기에만 임시 저장됩니다.
+            </div>
+
             <div class="score-board-area">
                 <div class="score-card">
                     <span class="score-label">누적 점수</span>
@@ -510,7 +522,7 @@
                 <button id="btn-start" class="btn-primary">시작하기</button>
             </div>
             
-            <!-- 데스크탑에서는 좌측 텍스트로 사용 -->
+            <!-- 피드백 텍스트 (정답/오답) -->
             <div class="note-text-display" id="note-text">옵션을 선택하고 시작 버튼을 누르세요.</div>
         </div>
 
@@ -583,7 +595,7 @@
             <div class="lb-row header">
                 <span class="lb-rank">순위</span>
                 <span class="lb-date">달성 일시</span>
-                <span class="lb-score">점수</span>
+                <span class="lb-score">누적 점수</span>
             </div>
             <div id="lb-content">
                 <!-- JS로 리스트 주입 -->
@@ -597,43 +609,65 @@
     import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, doc, setDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    // --- Firebase & 리더보드/점수 로직 ---
+    // --- 데이터베이스(Firebase) 연결 로직 ---
     let db, auth;
     let currentUser = null;
     let cumulativeScore = 0;
-    let appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+    let isOfflineMode = false;
+    let appId = 'lemon-tree-guitar-app'; // 깃허브 페이지용 고유 ID
 
     const cumulativeScoreEl = document.getElementById('cumulative-score');
     const lbContentEl = document.getElementById('lb-content');
     const modalEl = document.getElementById('leaderboard-modal');
+    const dbWarningEl = document.getElementById('db-warning');
     
     let lbUnsubscribe = null;
 
     async function initFirebase() {
         try {
-            if (typeof __firebase_config === 'undefined') {
-                console.warn("로컬 환경. 클라우드 기능 비활성화");
+            let firebaseConfig;
+
+            // 1. 설정값 확인
+            if (typeof __firebase_config !== 'undefined') {
+                // 제 내부 테스트 환경인 경우
+                firebaseConfig = JSON.parse(__firebase_config);
+                appId = typeof __app_id !== 'undefined' ? __app_id : appId;
+            } else {
+                // 🚨 선생님의 깃허브 페이지 (외부 호스팅) 환경인 경우 🚨
+                // 아래 항목을 지우고, 선생님의 Firebase 콘솔에서 복사한 설정값으로 교체해야 합니다.
+                firebaseConfig = {
+                    apiKey: "여기에_API_KEY_입력",
+                    authDomain: "여기에_authDomain_입력",
+                    projectId: "여기에_projectId_입력",
+                    storageBucket: "여기에_storageBucket_입력",
+                    messagingSenderId: "여기에_messagingSenderId_입력",
+                    appId: "여기에_appId_입력"
+                };
+            }
+
+            // 만약 선생님이 설정값을 아직 입력하지 않았다면 (기본값 그대로라면) 오프라인 모드로 전환
+            if (firebaseConfig.apiKey === "여기에_API_KEY_입력") {
+                isOfflineMode = true;
+                dbWarningEl.style.display = 'block';
                 return;
             }
-            const firebaseConfig = JSON.parse(__firebase_config);
+
+            // 2. 파이어베이스 초기화
             const app = initializeApp(firebaseConfig);
             auth = getAuth(app);
             db = getFirestore(app);
 
-            // Rule 3: Auth First
-            const initAuth = async () => {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            };
-            await initAuth();
+            // 3. 익명 로그인 실행 (학생 고유 ID 생성 목적)
+            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                await signInWithCustomToken(auth, __initial_auth_token);
+            } else {
+                await signInAnonymously(auth);
+            }
 
+            // 4. 로그인 완료 시 본인 점수 실시간 연동
             onAuthStateChanged(auth, (user) => {
                 if (user) {
                     currentUser = user;
-                    // 자신의 누적 점수 실시간 연동 (리더보드 컬렉션 내 본인 문서)
                     const myLbRef = doc(db, 'artifacts', appId, 'public', 'data', 'leaderboard', user.uid);
                     onSnapshot(myLbRef, (docSnap) => {
                         if (docSnap.exists()) {
@@ -645,18 +679,26 @@
             });
         } catch (e) {
             console.error("Firebase init failed:", e);
+            isOfflineMode = true;
+            dbWarningEl.style.display = 'block';
         }
     }
 
+    // --- 점수 올리기 ---
     function addCumulativeScore(points) {
         cumulativeScore += points;
         cumulativeScoreEl.textContent = cumulativeScore;
         
+        if (isOfflineMode) {
+            // 오프라인 모드일때는 새로고침 하면 날아갑니다.
+            return;
+        }
+
         if (currentUser && db) {
             const now = new Date();
-            // 포맷: YY.MM.DD HH:mm
             const dateStr = `${now.getFullYear().toString().slice(2)}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
             
+            // 기존 문서(사용자 UID)에 덮어쓰기 -> 중복 방지
             const lbRef = doc(db, 'artifacts', appId, 'public', 'data', 'leaderboard', currentUser.uid);
             setDoc(lbRef, {
                 score: cumulativeScore,
@@ -666,24 +708,30 @@
         }
     }
 
+    // --- 명예의 전당 팝업 ---
     window.openLeaderboard = function() {
         modalEl.style.display = 'flex';
-        if (!currentUser || !db) {
-            lbContentEl.innerHTML = '<div style="text-align:center; padding: 20px;">서버 연결 중이거나 오프라인입니다.</div>';
+        
+        if (isOfflineMode || !currentUser || !db) {
+            lbContentEl.innerHTML = `
+                <div style="text-align:center; padding: 30px 10px; color: #64748b; font-size: 14px; line-height: 1.6;">
+                    <strong>데이터베이스 연동이 필요합니다.</strong><br>
+                    파이어베이스(Firebase) 설정값을 입력하셔야<br>글로벌 리더보드가 활성화됩니다.
+                </div>`;
             return;
         }
 
+        lbContentEl.innerHTML = '<div style="text-align:center; padding: 20px;">불러오는 중...</div>';
+        
         const lbCol = collection(db, 'artifacts', appId, 'public', 'data', 'leaderboard');
-        // Rule 2: 전체 가져와서 JS 메모리에서 정렬
         lbUnsubscribe = onSnapshot(lbCol, (snapshot) => {
             let records = [];
             snapshot.forEach(doc => records.push({ id: doc.id, ...doc.data() }));
             
-            // 점수 내림차순, 같으면 최신순
+            // 점수 내림차순 정렬
             records.sort((a, b) => b.score - a.score || b.timestamp - a.timestamp);
             
-            // 상위 30명
-            const topRecords = records.slice(0, 30);
+            const topRecords = records.slice(0, 50); // 상위 50명만
             
             lbContentEl.innerHTML = topRecords.map((r, i) => `
                 <div class="lb-row ${r.id === currentUser.uid ? 'my-row' : ''}">
@@ -697,8 +745,8 @@
                 lbContentEl.innerHTML = '<div style="text-align:center; padding: 20px;">아직 기록이 없습니다. 첫 번째로 점수를 올려보세요!</div>';
             }
         }, (error) => {
-            console.error("Leaderboard fetch error", error);
-            lbContentEl.innerHTML = '<div style="text-align:center; padding: 20px;">데이터를 불러오는 중 오류가 발생했습니다.</div>';
+            console.error("Leaderboard error", error);
+            lbContentEl.innerHTML = '<div style="text-align:center; padding: 20px; color: red;">데이터를 불러오는 중 오류가 발생했습니다. 권한 설정을 확인하세요.</div>';
         });
     }
 
@@ -707,7 +755,7 @@
         if (lbUnsubscribe) lbUnsubscribe();
     }
 
-    // --- 게임 로직 ---
+    // --- 게임 핵심 로직 ---
     const stringBaseMidi = [null, 64, 59, 55, 50, 45, 40]; 
     const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
     const stepBase = { 'C': 0, 'D': 1, 'E': 2, 'F': 3, 'G': 4, 'A': 5, 'B': 6 };
@@ -913,7 +961,7 @@
                 noteTextEl.textContent = `정답! 🎉 (+${currentProblemPoints}점)`;
                 noteTextEl.style.color = "var(--color-success)";
                 
-                // 누적 점수 증가 및 DB 저장
+                // 점수 추가 및 클라우드 저장
                 addCumulativeScore(currentProblemPoints); 
                 
                 setTimeout(() => {
@@ -923,7 +971,7 @@
             }
 
         } else {
-            // 오답 (틀려도 점수는 깎이지 않고 문제만 새로 출제됨)
+            // 오답
             isProcessing = true;
             noteTextEl.textContent = "오답! 괜찮아요, 다시 도전하세요. 😅";
             noteTextEl.style.color = "var(--color-error)";

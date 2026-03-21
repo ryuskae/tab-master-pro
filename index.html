@@ -25,9 +25,7 @@
         
         --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
         --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
         --radius-lg: 12px;
-        --radius-xl: 16px;
     }
 
     * { box-sizing: border-box; }
@@ -37,549 +35,366 @@
         background-color: var(--color-bg);
         color: var(--color-text-main);
         margin: 0;
-        padding: 0;
+        padding: 15px;
         user-select: none;
         display: flex;
         flex-direction: column;
         align-items: center;
-        min-height: 100vh;
     }
 
-    /* 반응형 게임 컨테이너 */
     .game-container {
         background: var(--color-surface);
         width: 100%;
-        max-width: 1200px;
-        display: flex;
-        flex-direction: column;
-        transition: all 0.3s ease;
+        max-width: 1400px;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
         padding: 20px;
-    }
-
-    /* 데스크탑/태블릿 최적화 (가로 분할 및 스크롤 제거) */
-    @media (min-width: 1024px) {
-        body {
-            justify-content: center;
-            height: 100vh;
-            overflow: hidden;
-            background-color: #e2e8f0;
-        }
-        .game-container {
-            border-radius: var(--radius-xl);
-            box-shadow: var(--shadow-lg);
-            height: 95vh;
-            max-height: 800px;
-            padding: 30px 40px;
-        }
-        .main-layout {
-            display: flex;
-            gap: 40px;
-            flex-grow: 1;
-            height: 100%;
-            overflow: hidden;
-        }
-        .left-panel {
-            flex: 0 0 320px;
-            display: flex;
-            flex-direction: column;
-            border-right: 2px solid #f1f5f9;
-            padding-right: 30px;
-        }
-        .right-panel {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            overflow: hidden;
-        }
-    }
-
-    @media (max-width: 1023px) {
-        .main-layout {
-            display: flex;
-            flex-direction: column;
-        }
-        .left-panel, .right-panel {
-            width: 100%;
-        }
-    }
-
-    /* 헤더 */
-    .header-content {
-        text-align: center;
-        margin-bottom: 25px;
-        flex-shrink: 0;
-    }
-    .header-content h1 {
-        margin: 0;
-        font-size: 28px;
-        font-weight: 800;
-        letter-spacing: -0.5px;
-    }
-    .header-content .subtitle {
-        margin: 4px 0 0 0;
-        font-size: 12px;
-        font-weight: 600;
-        color: var(--color-text-muted);
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    /* 스코어 보드 영역 */
-    .score-board-area {
         display: flex;
         flex-direction: column;
         gap: 15px;
-        margin-bottom: 25px;
     }
-    .score-card {
-        background: #f8fafc;
-        padding: 15px;
-        border-radius: var(--radius-lg);
-        text-align: center;
-        border: 2px solid var(--color-primary);
-        box-shadow: 0 4px 10px rgba(59, 130, 246, 0.1);
-    }
-    .score-label {
-        display: block;
-        font-size: 13px;
-        font-weight: 800;
-        color: var(--color-primary);
-        text-transform: uppercase;
-        margin-bottom: 5px;
-    }
-    .score-value {
-        display: block;
-        font-size: 32px;
-        font-weight: 900;
-        color: var(--color-text-main);
-    }
-    .btn-leaderboard {
-        background-color: var(--color-warning);
-        color: white;
-        border: none;
-        padding: 12px;
-        border-radius: var(--radius-lg);
-        font-size: 15px;
-        font-weight: 800;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        box-shadow: var(--shadow-sm);
-        transition: transform 0.1s, background-color 0.2s;
-    }
-    .btn-leaderboard:active { transform: scale(0.98); }
-    .btn-leaderboard:hover { background-color: #d97706; }
 
-    /* 컨트롤 패널 */
-    .control-panel {
+    /* 상단 메뉴바 형태 (사이드바 제거) */
+    .top-menu-bar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
         background: #f1f5f9;
         padding: 15px;
         border-radius: var(--radius-lg);
+        gap: 15px;
+    }
+
+    .header-content {
         display: flex;
         flex-direction: column;
-        gap: 12px;
-        border: 1px solid #e2e8f0;
-        margin-bottom: 20px;
     }
-    .control-group {
+    .header-content h1 { margin: 0; font-size: 24px; font-weight: 800; color: var(--color-text-main); letter-spacing: -0.5px; }
+    .header-content .subtitle { margin: 2px 0 0 0; font-size: 11px; font-weight: 600; color: var(--color-text-muted); text-transform: uppercase; }
+
+    /* 컨트롤 그룹 일렬 배치 */
+    .controls-wrapper {
         display: flex;
-        flex-direction: column;
-        gap: 6px;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
     }
-    .control-group label {
-        font-size: 12px;
-        font-weight: 700;
-        color: #475569;
-    }
+    .control-group { display: flex; align-items: center; gap: 8px; }
+    .control-group label { font-size: 13px; font-weight: 700; color: #475569; }
     select {
-        padding: 8px 10px;
-        border-radius: 6px;
-        border: 1px solid #cbd5e1;
-        font-size: 14px;
-        font-family: var(--font-main);
-        width: 100%;
-        background-color: white;
-        outline: none;
+        padding: 8px 10px; border-radius: 6px; border: 1px solid #cbd5e1;
+        font-size: 14px; font-family: var(--font-main); outline: none; background: white;
     }
     .btn-primary {
-        background-color: var(--color-primary);
-        color: white;
-        border: none;
-        padding: 14px;
-        border-radius: var(--radius-lg);
-        font-size: 16px;
-        font-weight: 800;
-        cursor: pointer;
-        box-shadow: var(--shadow-sm);
-        transition: transform 0.1s;
-        margin-top: 5px;
+        background-color: var(--color-primary); color: white; border: none;
+        padding: 10px 20px; border-radius: 8px; font-size: 15px; font-weight: 800; cursor: pointer;
+        box-shadow: var(--shadow-sm); transition: transform 0.1s;
     }
-    .btn-primary:active { transform: scale(0.98); }
+    .btn-primary:active { transform: scale(0.95); }
+
+    .score-area {
+        display: flex; gap: 10px; align-items: center;
+    }
+    .score-card {
+        background: white; padding: 5px 15px; border-radius: 8px; text-align: center; border: 1px solid #e2e8f0;
+    }
+    .score-label { font-size: 11px; font-weight: 800; color: var(--color-text-muted); display: block; }
+    .score-value { font-size: 20px; font-weight: 900; color: var(--color-primary); display: block; }
+    
+    .btn-leaderboard {
+        background-color: var(--color-warning); color: white; border: none;
+        padding: 10px 15px; border-radius: 8px; font-size: 13px; font-weight: 800; cursor: pointer;
+    }
 
     /* 피드백 텍스트 */
     .note-text-display {
-        font-size: 17px;
-        font-weight: 800;
-        color: var(--color-primary);
-        text-align: center;
-        min-height: 24px;
-        margin-bottom: 10px;
-        padding: 10px;
-        background: #eff6ff;
-        border-radius: 8px;
+        font-size: 18px; font-weight: 800; color: var(--color-primary);
+        text-align: center; padding: 10px; background: #eff6ff; border-radius: 8px;
     }
 
-    /* 섹션 레이아웃 */
+    /* 악보 공통 헤더 */
     .section-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-bottom: 2px solid #e2e8f0;
-        padding-bottom: 6px;
-        margin-bottom: 10px;
+        display: flex; justify-content: space-between; align-items: center;
+        border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; margin-bottom: 10px;
     }
-    .section-label {
-        font-size: 14px;
-        font-weight: 800;
-        color: var(--color-text-muted);
-    }
+    .section-label { font-size: 14px; font-weight: 800; color: var(--color-text-muted); }
     .btn-outline {
-        background-color: transparent;
-        color: var(--color-primary);
-        border: 1px solid var(--color-primary);
-        padding: 4px 10px;
-        border-radius: 6px;
-        font-size: 12px;
-        font-weight: 700;
-        cursor: pointer;
+        background: white; color: var(--color-primary); border: 2px solid var(--color-primary);
+        padding: 6px 15px; border-radius: 6px; font-size: 13px; font-weight: 800; cursor: pointer;
     }
 
-    /* 오선 악보 */
+    /* 오선 악보 (멜로디 대응) */
     .staff-container {
-        position: relative;
-        height: 120px;
-        margin-bottom: 20px;
-        display: flex;
-        justify-content: center;
-        padding-top: 15px;
+        position: relative; height: 130px; display: flex; justify-content: center; padding-top: 15px;
     }
     .staff-lines-bg {
-        position: relative;
-        width: 100%;
-        max-width: 350px;
-        height: 60px;
+        position: relative; width: 100%; max-width: 600px; height: 60px;
     }
-    .staff-line {
-        position: absolute;
-        height: 2px;
-        background-color: var(--color-text-main);
-        width: 100%;
-        left: 0;
-    }
-    .clef {
-        position: absolute;
-        left: -30px;
-        top: -15px;
-        font-size: 75px;
-        font-family: serif;
-        color: var(--color-text-main);
-    }
+    .staff-line { position: absolute; height: 2px; background-color: var(--color-text-main); width: 100%; left: 0; }
+    .clef { position: absolute; left: -30px; top: -15px; font-size: 75px; font-family: serif; color: var(--color-text-main); }
+    
     .note-wrapper {
-        position: absolute; left: 50%; transform: translateX(-50%); z-index: 5;
+        position: absolute; z-index: 5; transition: opacity 0.3s;
+        left: 50%; transform: translateX(-50%);
     }
     .note-head {
-        position: absolute; width: 16px; height: 12px; background-color: var(--color-text-main);
-        border-radius: 50%; transform: rotate(-15deg); left: -8px; top: -6px;
+        position: absolute; width: 18px; height: 14px; background-color: var(--color-text-main);
+        border-radius: 50%; transform: rotate(-15deg); left: -9px; top: -7px;
     }
-    .accidental {
-        position: absolute; left: -20px; top: -10px; font-size: 18px; font-weight: bold; font-family: serif;
+    .accidental { position: absolute; left: -22px; top: -10px; font-size: 18px; font-weight: bold; font-family: serif; }
+    .string-indicator {
+        position: absolute; left: 12px; top: -14px; font-size: 16px; font-weight: bold; color: #d97706; /* 주황색 원숫자 */
     }
     .ledger-line {
-        position: absolute; left: 50%; transform: translateX(-50%); width: 30px; height: 2px; background-color: var(--color-text-main); z-index: 1;
+        position: absolute; transform: translateX(-50%); width: 34px; height: 2px; background-color: var(--color-text-main); z-index: 1;
     }
+    
+    /* 정답 처리된 음표 */
     .note-wrapper.solved .note-head, .note-wrapper.solved .accidental {
         background-color: var(--color-success); color: var(--color-success);
     }
-
-    /* 타브 악보 */
-    #tab-wrapper {
-        overflow: hidden;
-        transition: max-height 0.3s ease, opacity 0.3s ease, margin 0.3s ease;
-        max-height: 200px;
-        opacity: 1;
-        margin-bottom: 20px;
+    .note-wrapper.playing .note-head {
+        background-color: var(--color-warning); box-shadow: 0 0 10px var(--color-warning);
     }
-    #tab-wrapper.hidden { max-height: 0; opacity: 0; margin-bottom: 0; }
+
+    /* 타브 악보 (간격 대폭 확대) */
+    #tab-wrapper { transition: max-height 0.3s ease, opacity 0.3s ease; max-height: 300px; opacity: 1; overflow: hidden; }
+    #tab-wrapper.hidden { max-height: 0; opacity: 0; margin-bottom: 0; border: none; padding: 0; }
     
     .tab-container {
-        position: relative; height: 90px; display: flex; flex-direction: column; justify-content: center; padding: 0 30px;
+        position: relative; height: 160px; display: flex; flex-direction: column; justify-content: center; padding: 0 30px;
     }
     .tab-lines-bg {
-        position: relative; height: 75px; display: flex; flex-direction: column; justify-content: space-between; max-width: 350px; margin: 0 auto; width: 100%;
+        position: relative; height: 130px; display: flex; flex-direction: column; justify-content: space-between; max-width: 600px; margin: 0 auto; width: 100%;
     }
-    .tab-line { height: 1px; background-color: var(--color-text-muted); width: 100%; display: flex; align-items: center; }
+    .tab-line { height: 1.5px; background-color: var(--color-text-muted); width: 100%; }
     .tab-line::before {
-        content: attr(data-string); position: absolute; left: -20px; font-size: 12px; font-weight: 700; color: var(--color-text-muted);
+        content: attr(data-string); position: absolute; left: -20px; font-size: 14px; font-weight: 700; color: var(--color-text-muted); margin-top: -8px;
     }
     .tab-numbers-area { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
     .tab-number {
-        position: absolute; left: 50%; transform: translate(-50%, -50%);
-        background: var(--color-surface); padding: 0 4px; font-size: 14px; font-weight: 800; border-radius: 4px; z-index: 10;
-        box-shadow: 0 0 0 2px var(--color-surface);
+        position: absolute; transform: translate(-50%, -50%);
+        background: var(--color-surface); padding: 0 6px; font-size: 18px; font-weight: 900; border-radius: 4px; z-index: 10;
+        box-shadow: 0 0 0 3px var(--color-surface); color: var(--color-text-main);
     }
+    .tab-number.solved { color: var(--color-success); }
 
-    /* 지판 */
-    .scroll-hint {
-        text-align: center; font-size: 12px; font-weight: 700; color: var(--color-warning);
-        margin-bottom: 8px; animation: pulseHint 2s infinite;
-    }
-    @media (min-width: 1024px) {
-        .scroll-hint { display: none; }
-    }
-    
+    /* 대형 기타 지판 (터치 최적화) */
     .guitar-area-wrapper {
-        width: 100%; overflow-x: auto; padding-bottom: 10px;
-        -webkit-overflow-scrolling: touch;
+        width: 100%; overflow-x: auto; padding-bottom: 15px; -webkit-overflow-scrolling: touch;
+        background: #e2e8f0; border-radius: var(--radius-lg); padding: 15px;
     }
-    .guitar-area-wrapper::-webkit-scrollbar { height: 8px; }
-    .guitar-area-wrapper::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 4px; }
+    .guitar-area-wrapper::-webkit-scrollbar { height: 12px; }
+    .guitar-area-wrapper::-webkit-scrollbar-thumb { background-color: #94a3b8; border-radius: 6px; }
 
-    .guitar-area { display: flex; flex-direction: column; min-width: 850px; }
+    /* 프렛 크기 조절 (가로 70%, 세로 1.3배) */
+    .guitar-area { display: flex; flex-direction: column; min-width: 1260px; }
+    
     .open-string-label {
-        position: relative; left: 80px; width: 40px; text-align: center;
-        font-size: 11px; font-weight: 800; color: var(--color-text-muted); margin-bottom: 4px;
+        position: relative; left: 100px; width: 60px; text-align: center;
+        font-size: 14px; font-weight: 800; color: var(--color-text-muted); margin-bottom: 5px;
     }
 
     .guitar-container {
         display: flex; align-items: center; position: relative;
-        box-shadow: var(--shadow-md); border-radius: 12px;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.3); border-radius: 12px;
     }
 
     .headstock {
-        width: 80px; height: 150px; background-color: var(--guitar-head);
-        border-radius: 12px 0 0 12px; border: 1px solid #b48554; position: relative; z-index: 2; flex-shrink: 0;
+        width: 100px; height: 234px; background-color: var(--guitar-head);
+        border-radius: 12px 0 0 12px; border: 2px solid #b48554; position: relative; z-index: 2; flex-shrink: 0;
     }
-    .nut { width: 6px; height: 150px; background: #f8fafc; border-right: 2px solid #94a3b8; border-left: 2px solid #cbd5e1; z-index: 3; flex-shrink: 0; }
+    .nut { width: 10px; height: 234px; background: #f8fafc; border-right: 3px solid #94a3b8; border-left: 2px solid #cbd5e1; z-index: 3; flex-shrink: 0; }
     
-    .peg { position: absolute; width: 12px; height: 20px; background: linear-gradient(to right, #f8fafc, #cbd5e1); border: 1px solid #94a3b8; }
-    .peg.top { top: -16px; border-radius: 4px 4px 0 0; } .peg.bottom { bottom: -16px; border-radius: 0 0 4px 4px; }
-    .peg-1 { left: 10px; } .peg-2 { left: 35px; } .peg-3 { left: 60px; }
-    .post { position: absolute; width: 8px; height: 8px; background: #94a3b8; border-radius: 50%; top: 50%; transform: translateY(-50%); }
-    .post-t1 { left: 12px; top: 25%; } .post-t2 { left: 37px; top: 25%; } .post-t3 { left: 62px; top: 25%; }
-    .post-b1 { left: 12px; top: 75%; } .post-b2 { left: 37px; top: 75%; } .post-b3 { left: 62px; top: 75%; }
+    /* 줄감개 복원 및 높이에 맞춘 위치 조정 */
+    .peg { position: absolute; width: 14px; height: 24px; background: linear-gradient(to right, #f8fafc, #cbd5e1); border: 1px solid #94a3b8; }
+    .peg.top { top: -20px; border-radius: 4px 4px 0 0; } .peg.bottom { bottom: -20px; border-radius: 0 0 4px 4px; }
+    .peg-1 { left: 15px; } .peg-2 { left: 45px; } .peg-3 { left: 75px; }
+    
+    .post { position: absolute; width: 10px; height: 10px; background: #94a3b8; border-radius: 50%; top: 50%; transform: translateY(-50%); }
+    .post-t1 { left: 17px; top: 25%; } .post-t2 { left: 47px; top: 25%; } .post-t3 { left: 77px; top: 25%; }
+    .post-b1 { left: 17px; top: 75%; } .post-b2 { left: 47px; top: 75%; } .post-b3 { left: 77px; top: 75%; }
 
     .fretboard {
-        display: flex; height: 150px; flex-grow: 1; background: var(--guitar-neck);
-        border-top: 2px solid #111; border-bottom: 2px solid #111; position: relative; border-radius: 0 8px 8px 0; overflow: hidden;
+        display: flex; height: 234px; flex-grow: 1; background: var(--guitar-neck);
+        border-top: 3px solid #111; border-bottom: 3px solid #111; position: relative; border-radius: 0 8px 8px 0; overflow: hidden;
     }
-    .fret-column { flex: 1; border-right: 3px solid var(--guitar-frets); display: flex; flex-direction: column; position: relative; }
+    .fret-column { flex: 1; border-right: 4px solid var(--guitar-frets); display: flex; flex-direction: column; position: relative; }
     .fret-column:last-child { border-right: none; }
     
     .fret-column:nth-child(4)::after, .fret-column:nth-child(6)::after, .fret-column:nth-child(8)::after, .fret-column:nth-child(10)::after, .fret-column:nth-child(16)::after {
         content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-        width: 12px; height: 12px; background-color: rgba(255,255,255,0.8); border-radius: 50%; pointer-events: none; z-index: 1;
+        width: 16px; height: 16px; background-color: rgba(255,255,255,0.8); border-radius: 50%; pointer-events: none; z-index: 1;
     }
     .fret-column:nth-child(13)::before, .fret-column:nth-child(13)::after {
         content: ''; position: absolute; left: 50%; transform: translateX(-50%);
-        width: 10px; height: 10px; background-color: rgba(255,255,255,0.8); border-radius: 50%; pointer-events: none; z-index: 1;
+        width: 14px; height: 14px; background-color: rgba(255,255,255,0.8); border-radius: 50%; pointer-events: none; z-index: 1;
     }
     .fret-column:nth-child(13)::before { top: 25%; } .fret-column:nth-child(13)::after { bottom: 25%; }
-    .fret-column.fret-0 { flex: 0.4; background-color: rgba(255,255,255,0.03); border-right: 1px solid rgba(255,255,255,0.1); }
+    
+    .fret-column.fret-0 { flex: 0.3; background-color: rgba(255,255,255,0.03); border-right: 2px solid rgba(255,255,255,0.1); }
     .fret-column.fret-0::after { display: none; }
 
     .string-cell { flex: 1; position: relative; cursor: pointer; z-index: 5; display: flex; align-items: center; justify-content: center; }
-    .string-cell:hover { background-color: rgba(255, 255, 255, 0.1); }
-    .open-number { position: absolute; color: rgba(255,255,255,0.4); font-weight: bold; font-size: 12px; pointer-events: none; }
+    .string-cell:hover { background-color: rgba(255, 255, 255, 0.2); }
+    .open-number { position: absolute; color: rgba(255,255,255,0.6); font-weight: bold; font-size: 16px; pointer-events: none; }
 
     .visual-string {
         position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%);
-        background-color: var(--guitar-string); pointer-events: none; box-shadow: 0 1px 3px rgba(0,0,0,0.8); z-index: 2;
+        background-color: var(--guitar-string); pointer-events: none; box-shadow: 0 2px 5px rgba(0,0,0,0.9); z-index: 2;
     }
-    .visual-string-1 { height: 1px; } .visual-string-2 { height: 1.5px; } .visual-string-3 { height: 2px; }
-    .visual-string-4 { height: 2.5px; background: repeating-linear-gradient(90deg, #e2e8f0, #e2e8f0 2px, #94a3b8 2px, #94a3b8 4px); }
-    .visual-string-5 { height: 3px; background: repeating-linear-gradient(90deg, #e2e8f0, #e2e8f0 2px, #94a3b8 2px, #94a3b8 4px); }
-    .visual-string-6 { height: 4px; background: repeating-linear-gradient(90deg, #e2e8f0, #e2e8f0 2px, #94a3b8 2px, #94a3b8 4px); }
+    .visual-string-1 { height: 1.5px; } .visual-string-2 { height: 2px; } .visual-string-3 { height: 2.5px; }
+    .visual-string-4 { height: 3.5px; background: repeating-linear-gradient(90deg, #e2e8f0, #e2e8f0 3px, #94a3b8 3px, #94a3b8 6px); }
+    .visual-string-5 { height: 4.5px; background: repeating-linear-gradient(90deg, #e2e8f0, #e2e8f0 3px, #94a3b8 3px, #94a3b8 6px); }
+    .visual-string-6 { height: 6px; background: repeating-linear-gradient(90deg, #e2e8f0, #e2e8f0 3px, #94a3b8 3px, #94a3b8 6px); }
 
+    /* 대형 손가락 애니메이션 */
     .realistic-finger {
-        position: absolute; width: 24px; background: linear-gradient(to right, #f6d3a8, #e5b078, #f6d3a8);
-        border-radius: 12px 12px 45% 45%; box-shadow: 2px 4px 10px rgba(0,0,0,0.6); z-index: 100; transform-origin: top center;
+        position: absolute; width: 36px; background: linear-gradient(to right, #f6d3a8, #e5b078, #f6d3a8);
+        border-radius: 18px 18px 45% 45%; box-shadow: 3px 6px 15px rgba(0,0,0,0.7); z-index: 100; transform-origin: top center;
         animation: dropFinger 0.15s ease-out forwards;
     }
     .realistic-nail {
-        position: absolute; bottom: 3px; left: 50%; transform: translateX(-50%); width: 14px; height: 16px;
-        background: #fae6ce; border-radius: 50% 50% 40% 40%; border: 1px solid #d49f57; box-shadow: inset 0 -1px 2px rgba(0,0,0,0.1);
+        position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%); width: 20px; height: 22px;
+        background: #fae6ce; border-radius: 50% 50% 40% 40%; border: 1px solid #d49f57; box-shadow: inset 0 -2px 3px rgba(0,0,0,0.1);
     }
-    .finger-joint { position: absolute; width: 60%; height: 2px; background: rgba(166, 107, 44, 0.3); left: 20%; border-radius: 50%; bottom: 30px; }
-    .finger-joint:nth-child(2) { bottom: 35px; width: 50%; left: 25%; }
+    .finger-joint { position: absolute; width: 60%; height: 3px; background: rgba(166, 107, 44, 0.4); left: 20%; border-radius: 50%; bottom: 40px; }
+    .finger-joint:nth-child(2) { bottom: 48px; width: 50%; left: 25%; }
 
     .answer-marker {
-        position: absolute; width: 18px; height: 18px; background-color: rgba(239, 68, 68, 0.9);
-        border: 2px solid #b91c1c; border-radius: 50%; z-index: 20; pointer-events: none;
-        box-shadow: 0 0 12px rgba(239, 68, 68, 0.8); animation: pulse 1s infinite;
+        position: absolute; width: 24px; height: 24px; background-color: rgba(239, 68, 68, 0.9);
+        border: 3px solid #b91c1c; border-radius: 50%; z-index: 20; pointer-events: none;
+        box-shadow: 0 0 15px rgba(239, 68, 68, 0.8); animation: pulse 1s infinite;
     }
 
-    /* 리더보드 모달 */
+    /* DB 경고 모달/팝업 공통 */
     .modal-overlay {
         display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(15, 23, 42, 0.8); z-index: 1000; justify-content: center; align-items: center;
-        backdrop-filter: blur(4px);
+        background: rgba(15, 23, 42, 0.8); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(4px);
     }
     .modal-content {
-        background: white; width: 90%; max-width: 450px; border-radius: var(--radius-xl);
-        padding: 25px; box-shadow: var(--shadow-lg); display: flex; flex-direction: column; max-height: 80vh;
+        background: white; width: 90%; max-width: 450px; border-radius: var(--radius-lg);
+        padding: 25px; display: flex; flex-direction: column; max-height: 80vh;
     }
-    .modal-header {
-        display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
-    }
-    .modal-header h2 { margin: 0; font-size: 22px; color: var(--color-text-main); }
-    .btn-close {
-        background: transparent; border: none; font-size: 24px; cursor: pointer; color: var(--color-text-muted);
-    }
-    .leaderboard-list {
-        overflow-y: auto; flex-grow: 1; padding-right: 5px;
-    }
-    .leaderboard-list::-webkit-scrollbar { width: 6px; }
-    .leaderboard-list::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .modal-header h2 { margin: 0; font-size: 20px; }
+    .btn-close { background: transparent; border: none; font-size: 24px; cursor: pointer; color: var(--color-text-muted); }
     
-    .lb-row {
-        display: flex; justify-content: space-between; align-items: center; padding: 12px 10px;
-        border-bottom: 1px solid #e2e8f0; font-size: 14px;
-    }
-    .lb-row header { font-weight: 800; color: var(--color-text-muted); border-bottom: 2px solid #cbd5e1; }
+    .leaderboard-list { overflow-y: auto; flex-grow: 1; }
+    .lb-row { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #e2e8f0; font-size: 14px; }
+    .lb-row.header { font-weight: 800; border-bottom: 2px solid #cbd5e1; }
     .lb-row.my-row { background-color: #eff6ff; font-weight: 800; color: var(--color-primary); border-radius: 6px; }
-    .lb-rank { width: 40px; text-align: center; }
-    .lb-date { flex-grow: 1; text-align: center; }
-    .lb-score { width: 60px; text-align: right; font-weight: 800; }
-
-    /* 연결 오류 메시지 디자인 */
-    .db-warning {
-        background: #fee2e2; color: #b91c1c; padding: 10px; text-align: center;
-        font-size: 13px; font-weight: 700; border-radius: 8px; margin-bottom: 15px;
-        display: none;
-    }
 
     @keyframes dropFinger { 0% { transform: scaleY(0); opacity: 0; } 100% { transform: scaleY(1); opacity: 1; } }
     @keyframes pulse { 0% { transform: scale(0.9); opacity: 1; } 50% { transform: scale(1.3); opacity: 0.8; } 100% { transform: scale(0.9); opacity: 1; } }
-    @keyframes pulseHint { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
 </style>
 </head>
 <body>
 
 <div class="game-container">
-    <div class="header-content">
-        <h1>Tab Master Pro</h1>
-        <p class="subtitle">Created by LemonTree Guitar Academy</p>
-    </div>
-
-    <div class="main-layout">
-        <div class="left-panel">
-            
-            <div id="db-warning" class="db-warning">
-                ⚠️ 외부 서버(Firebase) 연결이 필요합니다.<br>점수가 기기에만 임시 저장됩니다.
+    
+    <!-- 상단 메뉴바 (가로 레이아웃 대체) -->
+    <div class="top-menu-bar">
+        <div class="header-content">
+            <h1>Tab Master Pro</h1>
+            <p class="subtitle">LemonTree Guitar Academy</p>
+        </div>
+        
+        <div class="controls-wrapper">
+            <div class="control-group">
+                <label>모드</label>
+                <select id="opt-mode">
+                    <option value="1">멜로디 (단음 연습)</option>
+                    <option value="2">2화음 (파워코드 등)</option>
+                    <option value="3">3화음 (트라이어드)</option>
+                    <option value="4">4화음 (오픈코드)</option>
+                    <option value="5">5화음 (오픈코드)</option>
+                    <option value="6">6화음 (풀 스트럼)</option>
+                </select>
             </div>
-
-            <div class="score-board-area">
-                <div class="score-card">
-                    <span class="score-label">누적 점수</span>
-                    <span class="score-value" id="cumulative-score">0</span>
-                </div>
-                <button class="btn-leaderboard" onclick="openLeaderboard()">
-                    🏆 명예의 전당 보기
-                </button>
+            <div class="control-group">
+                <label>프렛</label>
+                <select id="opt-range">
+                    <option value="0-4">0~4 (로우)</option>
+                    <option value="5-9">5~9 (미들)</option>
+                    <option value="10-15">10~15 (하이)</option>
+                    <option value="0-15" selected>전체 프렛</option>
+                </select>
             </div>
-            
-            <div class="control-panel">
-                <div class="control-group">
-                    <label>모드 설정</label>
-                    <select id="opt-mode">
-                        <option value="1">단일 음 (초보)</option>
-                        <option value="2">2화음 (중급)</option>
-                        <option value="3">3화음 (고급)</option>
-                        <option value="4">4화음 (마스터)</option>
-                    </select>
-                </div>
-                <div class="control-group">
-                    <label>프렛 훈련 범위</label>
-                    <select id="opt-range">
-                        <option value="0-4">0 ~ 4 프렛 (로우)</option>
-                        <option value="5-9">5 ~ 9 프렛 (미들)</option>
-                        <option value="10-15">10 ~ 15 프렛 (하이)</option>
-                        <option value="0-15" selected>0 ~ 15 전체 프렛</option>
-                    </select>
-                </div>
-                <div class="control-group">
-                    <label>임시표(#) 포함</label>
-                    <select id="opt-acc">
-                        <option value="natural">조표 없음 (다장조)</option>
-                        <option value="all">모든 음 (# 포함)</option>
-                    </select>
-                </div>
-                <button id="btn-start" class="btn-primary">시작하기</button>
-            </div>
-            
-            <div class="note-text-display" id="note-text">옵션을 선택하고 시작 버튼을 누르세요.</div>
+            <button id="btn-start" class="btn-primary">시작하기</button>
         </div>
 
-        <div class="right-panel">
-            <div class="section-header">
-                <span class="section-label">오선 악보 (Standard Notation)</span>
+        <div class="score-area">
+            <div class="score-card">
+                <span class="score-label">누적 점수</span>
+                <span class="score-value" id="cumulative-score">0</span>
             </div>
-            <div class="staff-container">
-                <div class="staff-lines-bg" id="staff-lines-bg">
-                    <div class="staff-line" style="top: 0px;"></div>
-                    <div class="staff-line" style="top: 15px;"></div>
-                    <div class="staff-line" style="top: 30px;"></div>
-                    <div class="staff-line" style="top: 45px;"></div>
-                    <div class="staff-line" style="top: 60px;"></div>
-                    <div class="clef">&#119070;</div>
-                    <div id="staff-notes-area"></div>
-                </div>
-            </div>
+            <button class="btn-leaderboard" onclick="openLeaderboard()">🏆 명예의 전당</button>
+        </div>
+    </div>
 
-            <div id="tab-wrapper">
-                <div class="section-header">
-                    <span class="section-label">타브 악보 (TAB)</span>
-                    <button id="btn-toggle-tab" class="btn-outline">숨기기</button>
-                </div>
-                <div class="tab-container" id="tab-container">
-                    <div class="tab-lines-bg">
-                        <div class="tab-line" data-string="e"></div>
-                        <div class="tab-line" data-string="B"></div>
-                        <div class="tab-line" data-string="G"></div>
-                        <div class="tab-line" data-string="D"></div>
-                        <div class="tab-line" data-string="A"></div>
-                        <div class="tab-line" data-string="E"></div>
-                        <div class="tab-numbers-area" id="tab-numbers-area"></div>
-                    </div>
-                </div>
-            </div>
+    <div class="note-text-display" id="note-text">옵션을 선택하고 시작 버튼을 누르세요.</div>
 
-            <div class="section-header">
-                <span class="section-label">프렛보드 (클릭하여 연주)</span>
-            </div>
-            <div class="scroll-hint">↔ 가로로 스크롤하여 전체 지판을 확인하세요</div>
-            <div class="guitar-area-wrapper">
-                <div class="guitar-area">
-                    <div class="open-string-label">개방현</div>
-                    <div class="guitar-container">
-                        <div class="headstock">
-                            <div class="peg top peg-1"></div><div class="peg top peg-2"></div><div class="peg top peg-3"></div>
-                            <div class="peg bottom peg-1"></div><div class="peg bottom peg-2"></div><div class="peg bottom peg-3"></div>
-                            <div class="post post-t1"></div><div class="post post-t2"></div><div class="post post-t3"></div>
-                            <div class="post post-b1"></div><div class="post post-b2"></div><div class="post post-b3"></div>
-                        </div>
-                        <div class="nut"></div>
-                        <div class="fretboard" id="fretboard"></div>
-                    </div>
-                </div>
+    <!-- 악보 영역 -->
+    <div class="section-header">
+        <span class="section-label">오선 악보 (Standard Notation)</span>
+    </div>
+    <div class="staff-container">
+        <div class="staff-lines-bg" id="staff-lines-bg">
+            <div class="staff-line" style="top: 0px;"></div>
+            <div class="staff-line" style="top: 15px;"></div>
+            <div class="staff-line" style="top: 30px;"></div>
+            <div class="staff-line" style="top: 45px;"></div>
+            <div class="staff-line" style="top: 60px;"></div>
+            <div class="clef">&#119070;</div>
+            <div id="staff-notes-area"></div>
+        </div>
+    </div>
+
+    <div class="section-header">
+        <span class="section-label">타브 악보 (TAB)</span>
+        <button id="btn-toggle-tab" class="btn-outline">타브 악보 숨기기</button>
+    </div>
+    
+    <div id="tab-wrapper">
+        <div class="tab-container" id="tab-container">
+            <div class="tab-lines-bg">
+                <div class="tab-line" data-string="e"></div>
+                <div class="tab-line" data-string="B"></div>
+                <div class="tab-line" data-string="G"></div>
+                <div class="tab-line" data-string="D"></div>
+                <div class="tab-line" data-string="A"></div>
+                <div class="tab-line" data-string="E"></div>
+                <div class="tab-numbers-area" id="tab-numbers-area"></div>
             </div>
         </div>
     </div>
+
+    <div class="section-header">
+        <span class="section-label">프렛보드 (클릭하여 연주)</span>
+        <span style="font-size:12px; color:var(--color-warning); font-weight:bold;">↔ 가로로 스크롤하여 전체 지판 확인</span>
+    </div>
+    
+    <div class="guitar-area-wrapper">
+        <div class="guitar-area">
+            <div class="open-string-label">개방현</div>
+            <div class="guitar-container">
+                <div class="headstock">
+                    <div class="peg top peg-1"></div><div class="peg top peg-2"></div><div class="peg top peg-3"></div>
+                    <div class="peg bottom peg-1"></div><div class="peg bottom peg-2"></div><div class="peg bottom peg-3"></div>
+                    <div class="post post-t1"></div><div class="post post-t2"></div><div class="post post-t3"></div>
+                    <div class="post post-b1"></div><div class="post post-b2"></div><div class="post post-b3"></div>
+                </div>
+                <div class="nut"></div>
+                <div class="fretboard" id="fretboard"></div>
+            </div>
+        </div>
+    </div>
+
 </div>
 
+<!-- 리더보드 모달 -->
 <div class="modal-overlay" id="leaderboard-modal">
     <div class="modal-content">
         <div class="modal-header">
@@ -588,12 +403,11 @@
         </div>
         <div class="leaderboard-list">
             <div class="lb-row header">
-                <span class="lb-rank">순위</span>
-                <span class="lb-date">달성 일시</span>
-                <span class="lb-score">누적 점수</span>
+                <span style="width:40px; text-align:center;">순위</span>
+                <span style="flex-grow:1; text-align:center;">달성 일시</span>
+                <span style="width:60px; text-align:right;">점수</span>
             </div>
-            <div id="lb-content">
-                </div>
+            <div id="lb-content"></div>
         </div>
     </div>
 </div>
@@ -603,30 +417,56 @@
     import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, doc, setDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    // --- 데이터베이스(Firebase) 연결 로직 ---
-    let db, auth;
-    let currentUser = null;
+    // ==========================================
+    // 1. 오디오 합성기 (Web Audio API)
+    // ==========================================
+    let audioCtx = null;
+    function initAudio() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+    }
+    
+    function playGuitarSound(midi) {
+        initAudio();
+        const freq = 440 * Math.pow(2, (midi - 69) / 12);
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        
+        gain.gain.setValueAtTime(1.5, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 2.0);
+        
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        
+        osc.start();
+        osc.stop(audioCtx.currentTime + 2.0);
+    }
+
+    // ==========================================
+    // 2. Firebase 데이터베이스 설정 (원장님 API 통합)
+    // ==========================================
+    let db, auth, currentUser = null;
     let cumulativeScore = 0;
-    let isOfflineMode = false;
-    let appId = 'lemon-tree-guitar-app'; // 깃허브 페이지용 고유 ID
+    let appId = 'lemon-tree-guitar-app';
 
     const cumulativeScoreEl = document.getElementById('cumulative-score');
     const lbContentEl = document.getElementById('lb-content');
     const modalEl = document.getElementById('leaderboard-modal');
-    const dbWarningEl = document.getElementById('db-warning');
-    
     let lbUnsubscribe = null;
 
     async function initFirebase() {
         try {
             let firebaseConfig;
-
-            // 1. 설정값 확인
             if (typeof __firebase_config !== 'undefined') {
                 firebaseConfig = JSON.parse(__firebase_config);
                 appId = typeof __app_id !== 'undefined' ? __app_id : appId;
             } else {
-                // ✅ 수정된 부분: const를 제거하여 상위 변수에 정상 할당
+                // 선생님께서 전달해주신 파이어베이스 실제 설정값
                 firebaseConfig = {
                     apiKey: "AIzaSyBVekwRGNfVGLdj83ADl_ZYgjy0TJAX488",
                     authDomain: "tab-master-pro.firebaseapp.com",
@@ -636,12 +476,6 @@
                     appId: "1:244497430147:web:7845403169f11b9eb40db6",
                     measurementId: "G-KG1E89RSDT"
                 };
-            }
-
-            if (firebaseConfig.apiKey === "여기에_API_KEY_입력") {
-                isOfflineMode = true;
-                dbWarningEl.style.display = 'block';
-                return;
             }
 
             const app = initializeApp(firebaseConfig);
@@ -663,70 +497,47 @@
                             cumulativeScore = docSnap.data().score || 0;
                             cumulativeScoreEl.textContent = cumulativeScore;
                         }
-                    }, (error) => console.error(error));
+                    }, (e) => console.log(e));
                 }
             });
         } catch (e) {
-            console.error("Firebase init failed:", e);
-            isOfflineMode = true;
-            dbWarningEl.style.display = 'block';
+            console.error("Firebase 연동 오류:", e);
         }
     }
 
     function addCumulativeScore(points) {
         cumulativeScore += points;
         cumulativeScoreEl.textContent = cumulativeScore;
+        if (!currentUser || !db) return;
         
-        if (isOfflineMode) return;
-
-        if (currentUser && db) {
-            const now = new Date();
-            const dateStr = `${now.getFullYear().toString().slice(2)}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-            
-            const lbRef = doc(db, 'artifacts', appId, 'public', 'data', 'leaderboard', currentUser.uid);
-            setDoc(lbRef, {
-                score: cumulativeScore,
-                updatedAt: dateStr,
-                timestamp: now.getTime()
-            }, { merge: true });
-        }
+        const now = new Date();
+        const dateStr = `${now.getFullYear().toString().slice(2)}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+        const lbRef = doc(db, 'artifacts', appId, 'public', 'data', 'leaderboard', currentUser.uid);
+        setDoc(lbRef, { score: cumulativeScore, updatedAt: dateStr, timestamp: now.getTime() }, { merge: true });
     }
 
     window.openLeaderboard = function() {
         modalEl.style.display = 'flex';
+        lbContentEl.innerHTML = '<div style="text-align:center; padding:20px;">불러오는 중...</div>';
         
-        if (isOfflineMode || !currentUser || !db) {
-            lbContentEl.innerHTML = `
-                <div style="text-align:center; padding: 30px 10px; color: #64748b; font-size: 14px; line-height: 1.6;">
-                    <strong>데이터베이스 연동이 필요합니다.</strong><br>
-                    파이어베이스(Firebase) 설정값을 입력하셔야<br>글로벌 리더보드가 활성화됩니다.
-                </div>`;
-            return;
-        }
-
-        lbContentEl.innerHTML = '<div style="text-align:center; padding: 20px;">불러오는 중...</div>';
+        if (!db) return;
         
         const lbCol = collection(db, 'artifacts', appId, 'public', 'data', 'leaderboard');
         lbUnsubscribe = onSnapshot(lbCol, (snapshot) => {
             let records = [];
             snapshot.forEach(doc => records.push({ id: doc.id, ...doc.data() }));
             records.sort((a, b) => b.score - a.score || b.timestamp - a.timestamp);
-            const topRecords = records.slice(0, 50);
             
-            lbContentEl.innerHTML = topRecords.map((r, i) => `
-                <div class="lb-row ${r.id === currentUser.uid ? 'my-row' : ''}">
-                    <span class="lb-rank">${i + 1}</span>
-                    <span class="lb-date">${r.updatedAt || '-'}</span>
-                    <span class="lb-score">${r.score}</span>
+            lbContentEl.innerHTML = records.slice(0, 50).map((r, i) => `
+                <div class="lb-row ${currentUser && r.id === currentUser.uid ? 'my-row' : ''}">
+                    <span style="width:40px; text-align:center;">${i + 1}</span>
+                    <span style="flex-grow:1; text-align:center;">${r.updatedAt || '-'}</span>
+                    <span style="width:60px; text-align:right; font-weight:900;">${r.score}</span>
                 </div>
             `).join('');
-
-            if(records.length === 0) {
-                lbContentEl.innerHTML = '<div style="text-align:center; padding: 20px;">아직 기록이 없습니다. 첫 번째로 점수를 올려보세요!</div>';
-            }
-        }, (error) => {
-            console.error("Leaderboard error", error);
-            lbContentEl.innerHTML = '<div style="text-align:center; padding: 20px; color: red;">데이터를 불러오는 중 오류가 발생했습니다. 권한 설정을 확인하세요.</div>';
+            if(records.length === 0) lbContentEl.innerHTML = '<div style="text-align:center; padding:20px;">기록이 없습니다.</div>';
+        }, () => {
+            lbContentEl.innerHTML = '<div style="color:red; text-align:center; padding:20px;">오류가 발생했습니다. 권한 설정을 확인하세요.</div>';
         });
     }
 
@@ -735,16 +546,42 @@
         if (lbUnsubscribe) lbUnsubscribe();
     }
 
+    // ==========================================
+    // 3. 기타 음악 이론 및 실제 코드(Chord) 데이터
+    // ==========================================
     const stringBaseMidi = [null, 64, 59, 55, 50, 45, 40]; 
     const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
     const stepBase = { 'C': 0, 'D': 1, 'E': 2, 'F': 3, 'G': 4, 'A': 5, 'B': 6 };
+    const stringCircles = ['', '①', '②', '③', '④', '⑤', '⑥'];
     const TOTAL_FRETS = 15;
-    const MAX_FRET_STRETCH = 3;
+
+    // 실제 기타 코드 사전
+    const REAL_CHORDS = [
+        { name: "C Major", notes: [{s:5,f:3},{s:4,f:2},{s:3,f:0},{s:2,f:1},{s:1,f:0}] },
+        { name: "G Major", notes: [{s:6,f:3},{s:5,f:2},{s:4,f:0},{s:3,f:0},{s:2,f:0},{s:1,f:3}] },
+        { name: "D Major", notes: [{s:4,f:0},{s:3,f:2},{s:2,f:3},{s:1,f:2}] },
+        { name: "A Major", notes: [{s:5,f:0},{s:4,f:2},{s:3,f:2},{s:2,f:2},{s:1,f:0}] },
+        { name: "E Major", notes: [{s:6,f:0},{s:5,f:2},{s:4,f:2},{s:3,f:1},{s:2,f:0},{s:1,f:0}] },
+        { name: "A minor", notes: [{s:5,f:0},{s:4,f:2},{s:3,f:2},{s:2,f:1},{s:1,f:0}] },
+        { name: "E minor", notes: [{s:6,f:0},{s:5,f:2},{s:4,f:2},{s:3,f:0},{s:2,f:0},{s:1,f:0}] },
+        { name: "D minor", notes: [{s:4,f:0},{s:3,f:2},{s:2,f:3},{s:1,f:1}] },
+        { name: "F Major", notes: [{s:6,f:1},{s:5,f:3},{s:4,f:3},{s:3,f:2},{s:2,f:1},{s:1,f:1}] },
+        { name: "B minor", notes: [{s:5,f:2},{s:4,f:4},{s:3,f:4},{s:2,f:3},{s:1,f:2}] },
+        { name: "C5 (Power)", notes: [{s:5,f:3},{s:4,f:5}] },
+        { name: "G5 (Power)", notes: [{s:6,f:3},{s:5,f:5}] },
+        { name: "A5 (Power)", notes: [{s:6,f:5},{s:5,f:7}] },
+        { name: "D5 (Power)", notes: [{s:5,f:5},{s:4,f:7}] },
+        { name: "E5 (Power)", notes: [{s:6,f:0},{s:5,f:2}] }
+    ];
+
+    const C_MAJOR_SCALE_PITCHES = [40,41,43,45,47,48,50,52,53,55,57,59,60,62,64,65,67,69,71,72];
 
     let currentProblem = [];
     let isProcessing = false;
     let isTabHidden = false;
     let currentProblemPoints = 0;
+    let isMelodyMode = false;
+    let melodyStepIndex = 0;
 
     const fretboardEl = document.getElementById('fretboard');
     const staffNotesAreaEl = document.getElementById('staff-notes-area');
@@ -752,20 +589,24 @@
     const tabWrapperEl = document.getElementById('tab-wrapper');
     const noteTextEl = document.getElementById('note-text');
     const btnToggleTab = document.getElementById('btn-toggle-tab');
-    const btnStart = document.getElementById('btn-start');
 
     btnToggleTab.addEventListener('click', () => {
+        initAudio(); 
         isTabHidden = !isTabHidden;
         if (isTabHidden) {
             tabWrapperEl.classList.add('hidden');
-            btnToggleTab.textContent = '보이기';
+            btnToggleTab.textContent = '타브 악보 보이기';
         } else {
             tabWrapperEl.classList.remove('hidden');
-            btnToggleTab.textContent = '숨기기';
+            btnToggleTab.textContent = '타브 악보 숨기기';
         }
+        if(currentProblem.length > 0) renderProblem();
     });
 
-    btnStart.addEventListener('click', () => startNewProblem());
+    document.getElementById('btn-start').addEventListener('click', () => {
+        initAudio();
+        startNewProblem();
+    });
 
     function initFretboard() {
         fretboardEl.innerHTML = '';
@@ -777,15 +618,18 @@
                 cell.className = 'string-cell';
                 cell.dataset.string = s;
                 cell.dataset.fret = f;
+                
                 const vString = document.createElement('div');
                 vString.className = `visual-string visual-string-${s}`;
                 cell.appendChild(vString);
+
                 if (f === 0) {
                     const openNum = document.createElement('div');
                     openNum.className = 'open-number';
                     openNum.textContent = '0';
                     cell.appendChild(openNum);
                 }
+
                 cell.addEventListener('click', () => handleFretClick(s, f, cell));
                 fretCol.appendChild(cell);
             }
@@ -805,131 +649,191 @@
         return { midi, noteName, isSharp, y, fullName: `${noteName}${notationOctave}` };
     }
 
-    function calculatePoints(numNotes, allowAccidentals, isHidden) {
-        let base = 10;
-        let multiplier = numNotes; 
-        if (allowAccidentals) multiplier *= 1.5; 
-        if (isHidden) multiplier *= 2.0; 
-        return Math.ceil(base * multiplier);
-    }
-
     function startNewProblem() {
         if(isProcessing) return;
         clearFingers();
         clearMarkers();
         noteTextEl.style.color = 'var(--color-primary)';
-        const numNotes = parseInt(document.getElementById('opt-mode').value);
-        const range = document.getElementById('opt-range').value.split('-').map(Number);
-        const allowAccidentals = document.getElementById('opt-acc').value === 'all';
-        currentProblemPoints = calculatePoints(numNotes, allowAccidentals, isTabHidden);
-        let targets = [];
-        let attempts = 0;
-        const minFretInRange = range[0] === 0 ? 1 : range[0];
-        const maxFretBase = Math.max(minFretInRange, range[1] - MAX_FRET_STRETCH);
+        
+        const mode = parseInt(document.getElementById('opt-mode').value);
+        isMelodyMode = (mode === 1);
+        melodyStepIndex = 0;
 
-        while (attempts < 1000) {
-            attempts++;
-            let handBase = Math.floor(Math.random() * (maxFretBase - minFretInRange + 1)) + minFretInRange;
-            let allowedFrets = [];
-            if (range[0] === 0) allowedFrets.push(0);
-            for (let f = handBase; f <= handBase + MAX_FRET_STRETCH; f++) {
-                if (f <= range[1]) allowedFrets.push(f);
-            }
-            let notePool = [];
-            for (let s = 1; s <= 6; s++) {
-                for (let f of allowedFrets) {
-                    let midi = stringBaseMidi[s] + f;
-                    let info = getNoteInfo(midi);
-                    if (!allowAccidentals && info.isSharp) continue;
-                    notePool.push({ string: s, fret: f, info: info });
+        let targets = [];
+        let problemName = "";
+
+        if (isMelodyMode) {
+            const noteCount = Math.floor(Math.random() * 7) + 2; // 2~8음
+            for (let i = 0; i < noteCount; i++) {
+                const randMidi = C_MAJOR_SCALE_PITCHES[Math.floor(Math.random() * C_MAJOR_SCALE_PITCHES.length)];
+                let bestPos = null;
+                for (let s = 1; s <= 6; s++) {
+                    let f = randMidi - stringBaseMidi[s];
+                    if (f >= 0 && f <= 5) { bestPos = { s, f }; break; }
                 }
-            }
-            let selectedStrings = [1, 2, 3, 4, 5, 6].sort(() => Math.random() - 0.5);
-            targets = [];
-            for (let s of selectedStrings) {
-                let optionsForString = notePool.filter(n => n.string === s);
-                if (optionsForString.length > 0) {
-                    let choice = optionsForString[Math.floor(Math.random() * optionsForString.length)];
-                    targets.push({ ...choice, solved: false });
+                if(!bestPos) {
+                    for (let s = 1; s <= 6; s++) {
+                        let f = randMidi - stringBaseMidi[s];
+                        if (f >= 0 && f <= 15) { bestPos = { s, f }; break; }
+                    }
                 }
-                if (targets.length === numNotes) break;
+                targets.push({ string: bestPos.s, fret: bestPos.f, info: getNoteInfo(randMidi), solved: false, isStrictString: false });
             }
-            if (targets.length === numNotes) {
-                let uniquePitches = new Set(targets.map(t => t.info.midi));
-                if (uniquePitches.size === numNotes) break;
-            }
+            problemName = `멜로디 연주 (${noteCount}음)`;
+            currentProblemPoints = noteCount * 15;
+        } else {
+            const possibleChords = REAL_CHORDS.filter(c => c.notes.length >= mode);
+            const selectedChord = possibleChords[Math.floor(Math.random() * possibleChords.length)];
+            const sortedNotes = [...selectedChord.notes].sort((a, b) => b.s - a.s); 
+            const notesToUse = sortedNotes.slice(0, mode);
+
+            targets = notesToUse.map(n => {
+                const isStrict = (n.f >= 4); 
+                return { string: n.s, fret: n.f, info: getNoteInfo(stringBaseMidi[n.s] + n.f), solved: false, isStrictString: isStrict };
+            });
+            problemName = `코드 연주: ${selectedChord.name}`;
+            currentProblemPoints = mode * 20 * (isTabHidden ? 2 : 1);
         }
-        currentProblem = targets.sort((a, b) => b.info.y - a.info.y);
+
+        currentProblem = targets;
         renderProblem();
-        const namesText = currentProblem.map(t => t.info.fullName).join(', ');
-        noteTextEl.textContent = `목표 음: ${namesText} (+${currentProblemPoints}점)`;
+        noteTextEl.textContent = `목표: ${problemName} (+${currentProblemPoints}점)`;
     }
 
     function renderProblem() {
         staffNotesAreaEl.innerHTML = '';
         tabNumbersAreaEl.innerHTML = '';
-        const yValues = currentProblem.map(t => t.info.y);
-        const maxY = Math.max(...yValues);
-        const minY = Math.min(...yValues);
-        for (let l = 75; l <= maxY + 1; l += 15) {
-            staffNotesAreaEl.innerHTML += `<div class="ledger-line" style="top: ${l}px;"></div>`;
-        }
-        for (let l = -15; l >= minY - 1; l -= 15) {
-            staffNotesAreaEl.innerHTML += `<div class="ledger-line" style="top: ${l}px;"></div>`;
-        }
+        
         currentProblem.forEach((target, index) => {
             const y = target.info.y;
-            staffNotesAreaEl.innerHTML += `
-                <div class="note-wrapper" id="note-${index}" style="top: ${y}px;">
+            let hPos = '50%';
+            if (isMelodyMode) {
+                const spacing = 80 / currentProblem.length;
+                hPos = `calc(15% + ${index * spacing}%)`;
+            }
+
+            // 개별 덧줄 처리 (중앙 정렬 해결)
+            let ledgerHtml = '';
+            if (y >= 75) {
+                for (let l = 75; l <= y + 1; l += 15) {
+                    ledgerHtml += `<div class="ledger-line" style="top: ${l}px; left: ${hPos};"></div>`;
+                }
+            }
+            if (y <= -15) {
+                for (let l = -15; l >= y - 1; l -= 15) {
+                    ledgerHtml += `<div class="ledger-line" style="top: ${l}px; left: ${hPos};"></div>`;
+                }
+            }
+
+            let stringNumHtml = '';
+            if (isTabHidden && target.isStrictString && !isMelodyMode) {
+                stringNumHtml = `<div class="string-indicator">${stringCircles[target.string]}</div>`;
+            }
+
+            let noteHtml = `
+                ${ledgerHtml}
+                <div class="note-wrapper ${index === melodyStepIndex && isMelodyMode ? 'playing' : ''}" id="note-${index}" style="top: ${y}px; left: ${hPos};">
                     <div class="note-head"></div>
                     ${target.info.isSharp ? `<div class="accidental">#</div>` : ''}
-                </div>`;
-            const tabY = (target.string - 1) * 15; 
-            tabNumbersAreaEl.innerHTML += `<div class="tab-number" id="tab-${index}" style="top: ${tabY}px;">${target.fret}</div>`;
+                    ${stringNumHtml}
+                </div>
+            `;
+            staffNotesAreaEl.innerHTML += noteHtml;
+
+            const tabY = (target.string - 1) * 26;
+            let tabHtml = `<div class="tab-number" id="tab-${index}" style="top: ${tabY}px; left: ${hPos};">${target.fret}</div>`;
+            tabNumbersAreaEl.innerHTML += tabHtml;
         });
     }
 
     function handleFretClick(s, f, cellElement) {
         if (currentProblem.length === 0 || isProcessing) return;
-        const clickedMidi = stringBaseMidi[s] + f;
-        const targetIndex = currentProblem.findIndex(t => {
-            if (t.solved) return false;
-            return isTabHidden ? t.info.midi === clickedMidi : (t.string === s && t.fret === f);
-        });
 
-        if (targetIndex !== -1) {
+        const clickedMidi = stringBaseMidi[s] + f;
+        playGuitarSound(clickedMidi); 
+        drawRealisticFinger(cellElement, s);
+
+        let isCorrect = false;
+        let targetIndex = -1;
+
+        if (isMelodyMode) {
+            const targetNote = currentProblem[melodyStepIndex];
+            if (isTabHidden) {
+                isCorrect = (targetNote.info.midi === clickedMidi);
+            } else {
+                isCorrect = (targetNote.string === s && targetNote.fret === f);
+            }
+            if (isCorrect) targetIndex = melodyStepIndex;
+        } else {
+            targetIndex = currentProblem.findIndex(t => {
+                if (t.solved) return false;
+                if (isTabHidden) {
+                    if (t.isStrictString) return t.string === s && t.fret === f;
+                    else return t.info.midi === clickedMidi; 
+                }
+                return t.string === s && t.fret === f; 
+            });
+            if (targetIndex !== -1) isCorrect = true;
+        }
+
+        if (isCorrect) {
             currentProblem[targetIndex].solved = true;
             document.getElementById(`note-${targetIndex}`).classList.add('solved');
+            document.getElementById(`note-${targetIndex}`).classList.remove('playing');
+            
             const tabEl = document.getElementById(`tab-${targetIndex}`);
-            if(tabEl) { tabEl.style.color = "var(--color-success)"; if (isTabHidden) tabEl.textContent = f; }
-            drawRealisticFinger(cellElement, s);
+            if(tabEl) {
+                tabEl.classList.add('solved');
+                if (isTabHidden && !currentProblem[targetIndex].isStrictString) tabEl.textContent = f;
+            }
+
+            if (isMelodyMode) {
+                melodyStepIndex++;
+                if (melodyStepIndex < currentProblem.length) {
+                    document.getElementById(`note-${melodyStepIndex}`).classList.add('playing');
+                }
+            }
+            
             if (currentProblem.every(t => t.solved)) {
                 isProcessing = true;
                 noteTextEl.textContent = `정답! 🎉 (+${currentProblemPoints}점)`;
                 noteTextEl.style.color = "var(--color-success)";
-                addCumulativeScore(currentProblemPoints); 
-                setTimeout(() => { isProcessing = false; startNewProblem(); }, 1000);
+                addCumulativeScore(currentProblemPoints);
+                
+                setTimeout(() => {
+                    isProcessing = false;
+                    startNewProblem();
+                }, 1200);
             }
+
         } else {
             isProcessing = true;
-            noteTextEl.textContent = "오답! 괜찮아요, 다시 도전하세요. 😅";
+            noteTextEl.textContent = "오답! 😅 다시 집중해보세요.";
             noteTextEl.style.color = "var(--color-error)";
-            clearFingers();
+            
             showAnswerMarkers(isTabHidden);
-            setTimeout(() => { isProcessing = false; startNewProblem(); }, 2500);
+
+            setTimeout(() => {
+                isProcessing = false;
+                startNewProblem();
+            }, 2000);
         }
     }
 
     function showAnswerMarkers(isHiddenMode) {
         currentProblem.forEach(target => {
-            if (isHiddenMode) {
+            if (isHiddenMode && !target.isStrictString) {
                 const targetMidi = target.info.midi;
                 for (let str = 1; str <= 6; str++) {
                     for (let frt = 0; frt <= TOTAL_FRETS; frt++) {
-                        if (stringBaseMidi[str] + frt === targetMidi) drawMarkerAt(str, frt);
+                        if (stringBaseMidi[str] + frt === targetMidi) {
+                            drawMarkerAt(str, frt);
+                        }
                     }
                 }
-            } else { drawMarkerAt(target.string, target.fret); }
+            } else {
+                drawMarkerAt(target.string, target.fret);
+            }
         });
     }
 
@@ -943,20 +847,27 @@
     }
 
     function drawRealisticFinger(cellElement, stringNum) {
-        if(cellElement.querySelector('.realistic-finger')) return;
         const finger = document.createElement('div');
         finger.className = 'realistic-finger';
         finger.innerHTML = `<div class="finger-joint"></div><div class="finger-joint"></div><div class="realistic-nail"></div>`;
+
         const fretboardRect = fretboardEl.getBoundingClientRect();
         const cellRect = cellElement.getBoundingClientRect();
         const relativeX = (cellRect.left - fretboardRect.left) + (cellRect.width / 2);
         const targetY = (cellRect.top - fretboardRect.top) + (cellRect.height / 2);
-        const startY = -30; 
-        const fingerHeight = targetY - startY + 8; 
-        finger.style.left = `${relativeX - 12}px`;
+
+        const startY = -40; 
+        const fingerHeight = targetY - startY + 12; 
+
+        finger.style.left = `${relativeX - 18}px`; 
         finger.style.top = `${startY}px`;
         finger.style.height = `${fingerHeight}px`;
+
         fretboardEl.appendChild(finger);
+        
+        setTimeout(() => {
+            if (finger.parentNode === fretboardEl) finger.remove();
+        }, 400);
     }
 
     function clearFingers() { document.querySelectorAll('.realistic-finger').forEach(f => f.remove()); }
@@ -964,6 +875,9 @@
 
     initFretboard();
     initFirebase();
+
 </script>
 </body>
 </html>
+
+
